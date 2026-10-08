@@ -1,9 +1,10 @@
 # brunoball
 
-This repo is designed for my passion project around baseball. I play in a 10-team,
-head-to-head categories fantasy baseball league with friends ([league rules](LEAGUE_RULES.md)). 
-Over the 2026 season I built tools for it: a draft tool for draft night, weekly power rankings
-for the group chat, and an end-of-season recap. 
+I play in a 10-team, head-to-head categories fantasy baseball league
+with friends ([league rules](LEAGUE_RULES.md)). Over the 2026 season
+I built a few tools for it: a [draft tool](https://mike-morreale-14.github.io/brunoball/draft-tool/) the whole league could use 
+before and during the draft, weekly power rankings for the group chat, 
+and an end-of-season recap to commemorate the year.
 
 ## Draft Scout
 
@@ -28,12 +29,12 @@ Coming soon: the end-of-season recap slideshow I made for the league.
 
 ## Replication
 
-In progress: replicating well respected analysis in the space with updated data, an experiment to see how prior results trend as the league shifts over time. 
+In progress: replicating well respected baseball analysis with updated data, an experiment to see how prior results trend as the league shifts over time. 
 
 ## Exploration
 
-In progress: research and in-season visuals, unfinished.
+In progress: Trading research and new in-season visuals.
 
-## How I used AI
+## AI Assistance
 
-The code written in this project is primarily AI written. 
+The code in this project is primarily written using Claude Code.  
