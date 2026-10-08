@@ -1,0 +1,41 @@
+{
+  "note": "The weights are my own judgement, not fitted to data. Each score is the weighted mean of the p_<input> percentiles that exist for a player; missing inputs are skipped, not counted as zero. Raw uses 2025 rates, never counting stats, so the delta (Underlying minus Raw) isn't driven by playing time.",
+  "hide_delta": ["spd"],
+  "reliability": {
+    "note": "The 2026 tool's reliability score, rebuilt on 2023-25: recency = games (hitters) or innings (SP) per season, averaged with weight e^(lambda * i) from oldest (i = 0) to newest; proj = Marcel projected PA or IP; recency and proj are percentiles within the group (share strictly below, 0-100); age_rel = 50 through age 33, 40 at 34, then 5 less per year, floored at 0. Consistency has weight 0 and isn't computed.",
+    "weights": { "recency": 45, "proj": 25, "age_rel": 10, "consistency": 0 },
+    "recency_lambda": 0.3
+  },
+  "hitter": {
+    "pwr": {
+      "main": { "barrel": 25, "ev": 20, "proj_iso": 20, "fb": 10, "proj_hr": 15, "act_hr": 10 },
+      "raw": { "act_hr_pa": 35, "act_iso": 25, "barrel": 20, "ev": 15, "fb": 5 },
+      "und": { "barrel": 40, "ev": 30, "xiso": 20, "fb": 10 }
+    },
+    "spd": {
+      "main": { "sprint": 40, "proj_sb": 35, "act_sb": 25 },
+      "raw": { "act_sb_pa": 50, "sprint": 50 },
+      "und": { "sprint": 70, "contact": 30 }
+    },
+    "avg": {
+      "main": { "xavg": 20, "proj_avg": 20, "proj_low_k": 15, "ocontact": 15, "proj_babip": 15, "act_avg": 15 },
+      "raw": { "act_avg": 30, "act_low_k": 30, "ocontact": 20, "act_babip": 20 },
+      "und": { "xavg": 35, "act_low_k": 30, "ocontact": 20, "contact": 15 }
+    }
+  },
+  "sp": {
+    "anc": {
+      "main": { "proj_ip": 20, "proj_qs": 20, "proj_low_era": 20, "proj_low_whip": 15, "low_xera": 15, "low_hard": 10 },
+      "raw": { "act_qs_gs": 25, "act_low_era": 25, "act_low_whip": 20 },
+      "und": { "low_xera": 40, "low_hard": 30, "gb": 30 }
+    },
+    "karm": {
+      "main": { "fbv": 25, "act_kpct": 20, "proj_k": 15, "proj_k9": 15, "whiff": 15, "low_zcon": 10 },
+      "raw": { "act_k9": 25, "fbv": 25, "act_kpct": 20 },
+      "und": { "fbv": 35, "whiff": 25, "act_kpct": 25, "low_zcon": 15 }
+    },
+    "vol": {
+      "main": { "hrfb": 35, "hard": 25, "barrel_ag": 25 }
+    }
+  }
+}

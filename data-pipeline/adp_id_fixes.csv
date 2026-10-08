@@ -1,0 +1,4 @@
+adp_name,adp_team,player_id,group,adp,note,site_note
+Max Muncy,LAD,571970,,,Two active players named Max Muncy; this is the Dodgers third baseman,
+Shohei Ohtani,LAD,660271,hitter,,FantasyPros lists one ADP for Ohtani; this row keeps it for his hitting,
+Shohei Ohtani,LAD,660271,sp,50,"Yahoo splits Ohtani into a hitter and a pitcher; pitcher ADP set by hand (about a 5th-round pick)","ADP 50 is my own estimate: Yahoo lists Ohtani's pitching separately, while FantasyPros gives him one ADP."

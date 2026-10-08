@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0e1a">
+  <meta name="description" content="Draft Scout 2026, public edition: a fantasy baseball draft companion built on free public data and Marcel projections.">
+  <title>Draft Scout 2026</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0e1a'/%3E%3Ctext x='50' y='62' font-size='40' text-anchor='middle' fill='%234a9eff' font-family='monospace' font-weight='700'%3EDS%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // Apply the saved theme before first paint, so the page doesn't flash dark then light.
+    try { if (localStorage.getItem('ds-theme') === 'light') document.documentElement.dataset.theme = 'light'; } catch (e) {}
+  </script>
+</head>
+<body>
+  <div class="app-root">
+    <header class="header-bar" id="header"></header>
+    <div id="panel-filters" class="panel filter-panel" hidden></div>
+    <div id="panel-team" class="panel" hidden></div>
+    <div id="panel-taken" class="panel" hidden></div>
+    <main class="app-split">
+      <section class="player-list" id="list" aria-label="Players by ADP"></section>
+      <section class="detail-panel" id="detail" aria-label="Player profile"></section>
+    </main>
+    <footer class="credits" id="credits">
+      <div class="edition-line">Rebuilt on free public data and my own Marcel projections.</div>
+      Data: <a href="https://statsapi.mlb.com" target="_blank" rel="noopener">MLB Stats API</a> and
+      <a href="https://baseballsavant.mlb.com" target="_blank" rel="noopener">Baseball Savant</a> © MLB Advanced Media, L.P. ·
+      Player IDs: <a href="https://github.com/chadwickbureau/register" target="_blank" rel="noopener">Chadwick Baseball Bureau</a> (ODC-By) ·
+      ADP: <a href="https://www.fantasypros.com/" target="_blank" rel="noopener">FantasyPros</a> ·
+      Projections: Marcel the Monkey Forecasting System by <a href="https://www.tangotiger.net/marcel/" target="_blank" rel="noopener">Tom Tango</a> ·
+      <a id="repo-link" href="#" target="_blank" rel="noopener">brunoball on GitHub</a>
+    </footer>
+  </div>
+  <div class="mobile-sheet" id="mobile-sheet" hidden></div>
+  <script src="app.js"></script>
+</body>
+</html>
