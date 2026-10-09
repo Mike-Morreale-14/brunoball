@@ -4,7 +4,7 @@ I play in a 10-team, head-to-head categories fantasy baseball league
 with friends ([league rules](LEAGUE_RULES.md)). Over the 2026 season
 I built a few tools for it: a [draft tool](https://mike-morreale-14.github.io/brunoball/draft-tool/) the whole league could use 
 before and during the draft, [weekly power rankings](https://mike-morreale-14.github.io/brunoball/power-rankings/) for the group chat, 
-and an end-of-season recap to commemorate the year.
+and an [end-of-season recap](https://mike-morreale-14.github.io/brunoball/wrapped/) to commemorate the year.
 
 ## Draft Scout
 
@@ -34,7 +34,13 @@ recent weeks counting most.
 
 ## Season Wrapped
 
-Coming soon: the end-of-season recap slideshow I made for the league.
+[<img src="wrapped/slides/08.jpg" width="700" alt="Schedule Luck slide: each team's actual and expected record, and the wins gained or lost to the schedule">](https://mike-morreale-14.github.io/brunoball/wrapped/)
+
+A slideshow recap of the regular season for the league, inspired by Spotify
+Wrapped, with the best and worst weeks, schedule luck and a slide for each team.
+
+**[View the slides](https://mike-morreale-14.github.io/brunoball/wrapped/)**
+· [About the recap](wrapped/)
 
 ## Replication
 

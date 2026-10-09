@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fantasy Baseball 2026 — Regular Season Wrapped</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Archivo:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F4F7FC;--panel:#FFF;--ink:#0F1B2D;--muted:#66788F;--line:rgba(15,27,45,.13);
+ --blue:#2F6BFF;--cyan:#0A9FBF;--magenta:#B8447E;--amber:#D8890A;--violet:#6E4FE8;
+ --gold:#D9A320;--acc:var(--blue)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Archivo',system-ui,sans-serif;color:var(--ink);background:#CBD6E6;
+ display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:100%;height:100dvh;max-width:820px;overflow:hidden;
+ background:linear-gradient(168deg,#FBFCFE 0%,#F1F5FB 45%,#E6EDF7 100%)}
+#stage:before{content:"";position:absolute;inset:0;pointer-events:none;
+ background:radial-gradient(120% 70% at 50% -12%,color-mix(in srgb,var(--acc) 16%,transparent),transparent 62%)}
+body.vid #stage{max-width:none;height:100vh}
+#ticks{position:absolute;top:0;left:0;right:0;display:flex;gap:3px;padding:12px 13px 0;z-index:40}
+.tick{flex:1;height:3px;background:rgba(15,27,45,.14);border-radius:2px;overflow:hidden}
+.tick i{display:block;height:100%;width:0;background:var(--acc)}
+.tick.done i,.tick.now i{width:100%}
+body.vid #ticks,body.vid #counter,body.vid #hint{display:none}
+.slide{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:52px 20px 58px}
+body.vid .slide{padding:88px 68px}
+.slide.on{display:flex}
+.inner{width:100%;transform-origin:center center;text-align:center}
+.slide.on .inner>*{animation:pop .42s cubic-bezier(.2,.8,.3,1) backwards}
+.slide.on .inner>*:nth-child(2){animation-delay:.05s}.slide.on .inner>*:nth-child(3){animation-delay:.1s}
+.slide.on .inner>*:nth-child(4){animation-delay:.15s}.slide.on .inner>*:nth-child(5){animation-delay:.2s}
+.slide.on .inner>*:nth-child(6){animation-delay:.25s}
+body.still .slide.on .inner>*{animation:none}
+@keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.eyebrow{font-family:'DM Mono',ui-monospace,monospace;font-size:10.5px;letter-spacing:.2em;
+ text-transform:uppercase;color:var(--acc);font-weight:500;margin-bottom:11px}
+body.vid .eyebrow{font-size:20px;margin-bottom:22px}
+h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(34px,9.2vw,62px);line-height:1;letter-spacing:-.03em;text-transform:uppercase}
+h2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(24px,6.2vw,40px);line-height:1.02;letter-spacing:-.025em;margin-bottom:11px;text-transform:uppercase}
+body.vid h1{font-size:94px}body.vid h2{font-size:58px;margin-bottom:20px}
+p.body{font-size:clamp(13.5px,3.6vw,16.5px);line-height:1.48;color:#37485E;max-width:38ch;margin-left:auto;margin-right:auto}
+body.vid p.body{font-size:28px;max-width:34ch}
+.big{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--acc);line-height:.88;
+ font-size:clamp(74px,22vw,142px);letter-spacing:-.045em}
+body.vid .big{font-size:200px}
+.caption{font-family:'DM Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.08em;color:var(--muted);margin-top:7px;text-transform:uppercase}
+body.vid .caption{font-size:20px;margin-top:14px}
+.lead{text-align:left}
+/* ---- universal record block ---- */
+.xr{display:inline-flex;gap:0;border:1.5px solid var(--ink);border-radius:7px;overflow:hidden;
+ box-shadow:2px 2px 0 rgba(15,27,45,.12);background:var(--panel);margin:0 auto}
+.xr .half{padding:6px 12px}
+.xr .half+.half{border-left:1.5px solid var(--ink)}
+.xr .lb{font-family:'DM Mono',ui-monospace,monospace;font-size:8.5px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.xr .vv{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:19px;letter-spacing:-.01em;margin-top:1px}
+.xr .exp .vv{color:var(--acc)}
+.xr .dl .vv.pos{color:var(--cyan)}
+.xr .dl .vv.neg{color:var(--magenta)}
+body.vid .xr{border-width:2.5px;border-radius:11px}
+body.vid .xr .half{padding:12px 24px}body.vid .xr .lb{font-size:16px}body.vid .xr .vv{font-size:36px}
+/* ---- cards ---- */
+.card{background:var(--panel);border:1.5px solid var(--ink);border-radius:8px;padding:11px;
+ box-shadow:3px 3px 0 rgba(15,27,45,.12);margin-top:9px;text-align:left}
+body.vid .card{border-width:2.5px;border-radius:13px;padding:22px;box-shadow:6px 6px 0 rgba(15,27,45,.12);margin-top:16px}
+.hl{display:flex;align-items:center;gap:9px;margin-top:9px;text-align:left}
+.hl .em{font-size:27px;line-height:1;flex:none}
+.hl .em.e2{font-size:23px}.hl .em.e3{font-size:19px}
+body.vid .hl .em{font-size:52px}body.vid .hl .em.e2{font-size:44px}body.vid .hl .em.e3{font-size:36px}
+.hl .card{margin-top:0;flex:1}
+.wk{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin-bottom:6px}
+.wk .nm{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14.5px}
+.wk .wl{font-family:'DM Mono',ui-monospace,monospace;font-size:10px;color:var(--muted)}
+body.vid .wk .nm{font-size:27px}body.vid .wk .wl{font-size:19px}
+.prose{font-size:12.5px;line-height:1.45;color:#37485E}
+.prose b{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--ink)}
+.prose .a{color:var(--acc);font-weight:700}
+body.vid .prose{font-size:23px}
+/* ---- rows ---- */
+.rows{display:flex;flex-direction:column;gap:4px;margin-top:5px;text-align:left}
+.rw{display:flex;align-items:center;gap:8px;background:var(--panel);border:1.5px solid var(--ink);border-radius:6px;
+ padding:7px 9px;box-shadow:2px 2px 0 rgba(15,27,45,.11)}
+body.vid .rw{padding:13px 17px;border-width:2.5px;border-radius:10px;gap:15px;box-shadow:4px 4px 0 rgba(15,27,45,.11)}
+.rw .rk{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;color:var(--acc);width:19px;flex:none}
+.rw .nm{flex:1;font-weight:600;font-size:12.5px;line-height:1.2}
+.rw .vl{font-family:'DM Mono',ui-monospace,monospace;font-size:11.5px;flex:none;white-space:nowrap}
+.rw .vb{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;flex:none}
+body.vid .rw .rk{font-size:25px;width:40px}body.vid .rw .nm{font-size:24px}
+body.vid .rw .vl{font-size:21px}body.vid .rw .vb{font-size:27px}
+.pos{color:var(--cyan)}.neg{color:var(--magenta)}
+.rw.gold{border-color:var(--gold);box-shadow:2px 2px 0 var(--gold)}
+.rw.play{border-color:var(--blue);box-shadow:2px 2px 0 rgba(47,107,255,.4)}
+.legend{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px;
+ font-family:'DM Mono',ui-monospace,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:-1px;border:1.5px solid}
+.lg-gold i{border-color:var(--gold);background:#FFF6DE}
+.lg-blue i{border-color:var(--blue);background:#E7EFFF}
+.lg-cut i{border-color:var(--ink);background:#fff}
+body.vid .legend{font-size:17px;gap:20px}body.vid .legend i{width:16px;height:16px}
+/* ---- category power grid ---- */
+.cg{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin-top:4px}
+.cgh{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12px;text-transform:uppercase;
+ text-align:left;margin-top:9px;border-bottom:2px solid var(--ink);padding-bottom:3px;
+ display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.cgh span{font-family:'DM Mono',ui-monospace,monospace;font-size:8px;font-weight:400;
+ text-transform:none;color:var(--muted);letter-spacing:0}
+body.vid .cgh{font-size:23px}body.vid .cgh span{font-size:15px}
+.cc .r{font-size:16px}
+.cglg{display:flex;gap:10px;justify-content:flex-start;flex-wrap:wrap;margin:4px 0 6px;text-align:left}
+.cglg span{font-family:'DM Mono',ui-monospace,monospace;font-size:8.5px;color:var(--muted);
+ background:rgba(15,27,45,.05);border-radius:5px;padding:3px 7px}
+.cglg b{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--ink);font-size:10px}
+.cgnote{font-family:'DM Mono',ui-monospace,monospace;font-size:8px;color:var(--muted);text-align:left;margin-bottom:4px}
+body.vid .cgnote{font-size:15px}
+body.vid .cglg span{font-size:16px;padding:6px 13px}body.vid .cglg b{font-size:19px}
+.cgl{font-family:'DM Mono',ui-monospace,monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+ color:var(--muted);text-align:left;margin:7px 0 3px}
+.cc{background:var(--panel);border:1.5px solid var(--ink);border-radius:6px;padding:5px 2px;text-align:center;
+ box-shadow:1.5px 1.5px 0 rgba(15,27,45,.1)}
+.cc .c{font-family:'DM Mono',ui-monospace,monospace;font-size:7.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.cc .r{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:19px;line-height:1;margin:1px 0}
+.cc .s{font-family:'DM Mono',ui-monospace,monospace;font-size:7.5px;color:var(--muted)}
+
+body.vid .cg{gap:6px}body.vid .cgl{font-size:16px;margin:14px 0 6px}
+body.vid .cc{padding:11px 3px;border-width:2.5px;border-radius:10px}
+body.vid .cc .c{font-size:14px}body.vid .cc .r{font-size:36px}body.vid .cc .s{font-size:13px}
+/* ---- king bars ---- */
+.kb{display:flex;align-items:center;gap:7px;margin-bottom:3px;text-align:left}
+.kb .c{font-family:'DM Mono',ui-monospace,monospace;font-size:9px;color:var(--muted);width:52px;flex:none;text-transform:uppercase}
+.kb .bar{flex:1;height:19px;background:rgba(15,27,45,.07);border-radius:4px;position:relative;overflow:hidden}
+.kb .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--acc);opacity:.24}
+.kb .bar span{position:absolute;left:6px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:600;white-space:nowrap}
+.kb .v{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:11.5px;color:var(--acc);width:46px;text-align:right;flex:none}
+body.vid .kb{gap:13px;margin-bottom:6px}
+body.vid .kb .c{font-size:16px;width:96px}body.vid .kb .bar{height:36px}
+body.vid .kb .bar span{font-size:19px;left:12px}body.vid .kb .v{font-size:21px;width:88px}
+.th{display:flex;align-items:center;gap:8px;margin-bottom:4px;justify-content:center;flex-wrap:wrap}
+.place{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12.5px;color:#fff;background:var(--acc);
+ border:1.5px solid var(--ink);padding:1px 8px;border-radius:4px}
+.rec{font-family:'DM Mono',ui-monospace,monospace;font-size:10.5px;color:var(--muted)}
+body.vid .place{font-size:24px;padding:3px 14px;border-width:2.5px}body.vid .rec{font-size:20px}
+.tag{display:inline-block;font-family:'DM Mono',ui-monospace,monospace;font-size:9px;letter-spacing:.12em;
+ text-transform:uppercase;color:#fff;background:var(--ink);padding:2px 7px;border-radius:3px;margin-bottom:7px}
+body.vid .tag{font-size:17px;padding:5px 13px;margin-bottom:14px}
+
+/* slick pill stat table */
+.mrow{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:5px;
+ font-family:'DM Mono',ui-monospace,monospace;font-size:9.5px;color:var(--muted)}
+.mrow .res{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12px;color:var(--ink)}
+.mrow .exp{color:var(--acc)}
+body.vid .mrow{font-size:18px;gap:14px}body.vid .mrow .res{font-size:23px}
+.pt{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:4px}
+.pt>div{background:rgba(15,27,45,.045);border-radius:9px;padding:5px 2px;text-align:center}
+.pt .k{font-family:'DM Mono',ui-monospace,monospace;font-size:7.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.pt .v{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;margin-top:1px;line-height:1.05}
+.pt .v em{font-style:normal;font-size:8px;font-weight:700;margin-left:2px;vertical-align:2px}
+.mW{color:#1F9D55}.mL{color:#D6337A}.mT{color:#D8890A}
+body.vid .pt .v em{font-size:15px;margin-left:4px}
+.ptr{display:flex;align-items:center;gap:6px;margin-top:5px}
+.ptt{font-family:'DM Mono',ui-monospace,monospace;font-size:8px;letter-spacing:.1em;color:var(--muted);
+ text-transform:uppercase;width:26px;flex:none;text-align:left}
+.ptr .pt{flex:1;margin-top:0}
+body.vid .pt>div{padding:10px 3px;border-radius:14px}
+body.vid .pt .k{font-size:14px}body.vid .pt .v{font-size:25px}
+body.vid .ptt{font-size:15px;width:52px}
+/* king rows */
+.ksec{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;
+ letter-spacing:.04em;text-align:left;margin:9px 0 5px;padding-bottom:3px;border-bottom:2px solid var(--ink)}
+body.vid .ksec{font-size:25px;margin:18px 0 10px}
+.kb3{display:grid;grid-template-columns:42px 1fr 34px 44px 44px;align-items:center;gap:6px;margin-bottom:6px;text-align:left}
+.kb3 .c{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12px;text-transform:uppercase;line-height:1.1}
+.kb3 .mid{display:block}
+.kb3 .tnrow{display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin-bottom:1px}
+.kb3 .tn{font-size:9.5px;font-weight:600;color:var(--acc)}
+.kb3 .tl{font-size:8.5px;font-weight:600;color:var(--magenta);opacity:.8}
+body.vid .kb3 .tl{font-size:16px}
+.kb3 .strip{display:block;position:relative;height:25px;background:linear-gradient(90deg,
+ rgba(52,190,114,.16),rgba(255,201,60,.14) 50%,rgba(214,51,122,.14));border-radius:3px}
+.kb3 .strip u{position:absolute;top:3px;width:1.5px;height:9px;background:rgba(15,27,45,.28);text-decoration:none}
+.kb3 .strip u.mark{background:rgba(15,27,45,.5);height:11px;top:2px}
+.kb3 .strip u.lead{background:var(--acc);width:3px;height:15px;top:0;border-radius:2px}
+.kb3 .strip u b{position:absolute;top:11px;left:50%;transform:translateX(-50%);
+ font-family:'DM Mono',ui-monospace,monospace;font-size:6.5px;font-weight:400;color:var(--muted);white-space:nowrap}
+.kb3 .strip u.lead b{color:var(--acc);font-weight:500;top:14px}
+.kb3 .sc{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;color:var(--acc);text-align:right}
+.kb3 .rc{font-family:'DM Mono',ui-monospace,monospace;font-size:8.5px;color:var(--muted);text-align:right}
+.kb3 .xp{color:var(--acc)}
+body.vid .kb3{grid-template-columns:104px 1fr 66px 86px 86px;gap:12px;margin-bottom:12px}
+body.vid .kb3 .c{font-size:17px}body.vid .kb3 .tn{font-size:18px}
+body.vid .kb3 .strip{height:46px}body.vid .kb3 .strip u{height:17px;width:2.5px;top:5px}
+body.vid .kb3 .strip u.lead{height:27px;width:5px;top:0}
+body.vid .kb3 .strip u.mark{height:20px;top:4px}
+body.vid .kb3 .strip u b{font-size:12px;top:22px}
+body.vid .kb3 .strip u.lead b{top:28px}
+body.vid .kb3 .sc{font-size:26px}body.vid .kb3 .rc{font-size:16px}
+.kb2{display:grid;grid-template-columns:52px 1fr 34px 46px 46px;align-items:center;gap:7px;margin-bottom:4px;text-align:left}
+.kb2 .c{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:9.5px;color:var(--ink);text-transform:uppercase}
+.kb2 .bar{height:21px;background:rgba(15,27,45,.06);border-radius:6px;position:relative;overflow:hidden}
+.kb2 .bar i{position:absolute;inset:0 auto 0 0;background:var(--acc);opacity:.18}
+.kb2 .bar u{position:absolute;top:0;bottom:0;width:1px;background:rgba(15,27,45,.16)}
+.kb2 .bar b{position:absolute;top:-2px;bottom:-2px;width:2.5px;background:var(--acc);border-radius:2px}
+.dl{display:flex;flex-direction:column;gap:2px}
+.dr{display:grid;grid-template-columns:1fr auto 1fr;align-items:baseline;gap:8px;padding:4px 8px;
+ border-bottom:1px solid rgba(15,27,45,.1)}
+.dr .c{font-family:'DM Mono',ui-monospace,monospace;font-size:9px;text-transform:uppercase;
+ color:var(--muted);letter-spacing:.06em;text-align:left}
+.dr .v{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:19px;color:var(--acc);text-align:center}
+.dr.bad .v{color:var(--magenta)}
+.dr .w{font-size:9.5px;font-weight:600;text-align:right;line-height:1.15}
+.dr .w em{font-style:normal;display:block;font-family:'DM Mono',ui-monospace,monospace;
+ font-weight:400;font-size:8px;color:var(--muted)}
+body.vid .dr{padding:9px 14px;gap:16px}
+body.vid .dr .c{font-size:17px}body.vid .dr .v{font-size:35px}
+body.vid .dr .w{font-size:18px}body.vid .dr .w em{font-size:15px}
+.dg{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.dc{background:var(--panel);border:1.5px solid var(--ink);border-radius:8px;padding:6px 4px;text-align:center;
+ box-shadow:2px 2px 0 rgba(15,27,45,.11)}
+.dc .c{font-family:'DM Mono',ui-monospace,monospace;font-size:7.5px;color:var(--muted);text-transform:uppercase}
+.dc .v{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:19px;color:var(--acc);line-height:1.05;margin:1px 0}
+.dc .w{font-family:'DM Mono',ui-monospace,monospace;font-size:7.5px;color:var(--muted);line-height:1.25}
+.dc .w em{font-style:normal;color:var(--amber);display:block}
+body.vid .dg{gap:10px}body.vid .dc{padding:14px 8px;border-width:2.5px;border-radius:13px}
+body.vid .dc .c{font-size:14px}body.vid .dc .v{font-size:36px}body.vid .dc .w{font-size:14px}
+.khead{display:grid;grid-template-columns:42px 1fr 34px 44px 44px;gap:6px;text-align:right;
+ font-family:'DM Mono',ui-monospace,monospace;font-size:7.5px;letter-spacing:.06em;
+ text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.khead span:nth-child(2){text-align:left}
+.kb2 .xp{color:var(--acc)}
+body.vid .khead{grid-template-columns:104px 1fr 66px 86px 86px;gap:12px;font-size:14px}
+.kb2 .bar span{position:absolute;left:7px;top:50%;transform:translateY(-50%);font-size:10.5px;font-weight:600;white-space:nowrap}
+.kb2 .sc{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;color:var(--acc);text-align:right;width:38px}
+.kb2 .rc{font-family:'DM Mono',ui-monospace,monospace;font-size:9px;color:var(--muted);text-align:right}
+body.vid .kb2{grid-template-columns:104px 1fr 66px 90px 90px;gap:14px;margin-bottom:8px}
+body.vid .kb2 .c{font-size:18px}body.vid .kb2 .bar{height:40px}
+body.vid .kb2 .bar span{font-size:20px;left:14px}body.vid .kb2 .sc{font-size:28px;width:72px}
+body.vid .kb2 .rc{font-size:17px}
+/* schedule luck comparison */
+.lk{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:9px;background:var(--panel);
+ border:1.5px solid var(--ink);border-radius:8px;padding:7px 10px;box-shadow:2px 2px 0 rgba(15,27,45,.11);margin-bottom:4px;text-align:left}
+.lk .nm{font-weight:600;font-size:12.5px}
+.lk .pair{display:flex;flex-direction:column;gap:1px;text-align:right}
+.lk .pair span{font-family:'DM Mono',ui-monospace,monospace;font-size:10px;color:var(--muted);white-space:nowrap}
+.lk .pair span b{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--ink);font-size:11.5px}
+.lk .d{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;width:52px;text-align:right}
+body.vid .lk{padding:14px 20px;border-width:2.5px;gap:18px}
+body.vid .lk .nm{font-size:24px}body.vid .lk .pair span{font-size:19px}
+body.vid .lk .pair span b{font-size:22px}body.vid .lk .d{font-size:33px;width:100px}
+/* two-column personal head */
+.p2{display:grid;grid-template-columns:1fr 1fr;gap:7px;align-items:start;margin-top:4px}
+.p2>*{min-width:0}
+.p2 .pt{gap:2px}
+.p2 .pt>div{padding:4px 1px;border-radius:6px}
+.p2 .pt .k{font-size:6.5px}
+.p2 .pt .v{font-size:10.5px}
+.p2 .ptr{gap:4px}
+.p2 .ptt{width:22px;font-size:7px}
+body.vid .p2 .pt .k{font-size:12px}body.vid .p2 .pt .v{font-size:20px}
+body.vid .p2 .ptt{width:44px;font-size:13px}
+body.vid .p2{gap:18px}
+.p2 .card{margin-top:0}
+.idrow{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:2px}
+.idtxt{text-align:center}
+.tbadge{width:74px;height:auto;flex:none;filter:drop-shadow(2px 3px 0 rgba(15,27,45,.16))}
+body.vid .idrow{gap:26px}body.vid .tbadge{width:150px}
+.msg{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;color:#37485E;margin:2px 0 4px}
+body.vid .msg{font-size:27px;margin:6px 0 10px}
+.samew{font-family:'DM Mono',ui-monospace,monospace;font-size:8.5px;color:var(--muted);margin-bottom:3px}
+body.vid .samew{font-size:15px}
+.wc{position:relative}
+.wc.act{border-color:var(--ink)}
+.wc.exp{border-color:var(--acc)}
+.wcl{font-family:'DM Mono',ui-monospace,monospace;font-size:8px;letter-spacing:.12em;text-transform:uppercase;
+ color:#fff;background:var(--ink);border-radius:3px;padding:2px 6px;display:inline-block;margin-bottom:5px}
+.wc.exp .wcl{background:var(--acc)}
+.wch{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.wch .wn{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12.5px}
+.wch .wo{font-family:'DM Mono',ui-monospace,monospace;font-size:9px;color:var(--muted)}
+.wcm{display:flex;align-items:baseline;gap:6px;margin:2px 0 3px;flex-wrap:wrap}
+.wcm .pri{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px}
+.wc.exp .wcm .pri{color:var(--acc)}
+.wcm .sec{font-family:'DM Mono',ui-monospace,monospace;font-size:8.5px;color:var(--muted)}
+body.vid .wcl{font-size:15px;padding:4px 12px}
+body.vid .wch .wn{font-size:24px}body.vid .wch .wo{font-size:17px}
+body.vid .wcm .pri{font-size:32px}body.vid .wcm .sec{font-size:16px}
+/* standings track */
+.trk{margin-top:7px}
+.trkhead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
+.trkhead .t{font-family:'DM Mono',ui-monospace,monospace;font-size:8.5px;letter-spacing:.1em;
+ text-transform:uppercase;color:var(--muted)}
+.trkhead .now{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:11px;color:var(--acc)}
+body.vid .trkhead .t{font-size:16px}body.vid .trkhead .now{font-size:21px}
+.trk svg{width:100%;display:block}
+.flow{margin-top:8px}.flow svg{width:100%;display:block}
+.flowlab{display:flex;justify-content:space-between;font-family:'DM Mono',ui-monospace,monospace;
+ font-size:8.5px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+body.vid .flowlab{font-size:16px;margin-top:6px}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.sc2{background:var(--panel);border:1.5px solid var(--ink);border-radius:8px;padding:7px 3px;text-align:center;
+ box-shadow:2px 2px 0 rgba(15,27,45,.12)}
+.sc2 .v{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:19px;color:var(--acc);line-height:1}
+.sc2 .l{font-family:'DM Mono',ui-monospace,monospace;font-size:7.5px;line-height:1.2;color:var(--muted);
+ text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
+body.vid .sgrid{gap:10px}body.vid .sc2{padding:18px 8px;border-width:2.5px;border-radius:13px}
+body.vid .sc2 .v{font-size:42px}body.vid .sc2 .l{font-size:15px}
+.zone{position:absolute;top:0;bottom:0;width:38%;z-index:30;cursor:pointer}
+#prevZ{left:0}#nextZ{right:0;width:62%}
+body.vid .zone{display:none}
+#hint{position:absolute;bottom:17px;left:0;right:0;text-align:center;font-family:'DM Mono',ui-monospace,monospace;
+ font-size:10px;letter-spacing:.14em;color:var(--muted);z-index:35;text-transform:uppercase}
+#counter{position:absolute;top:21px;right:13px;font-family:'DM Mono',ui-monospace,monospace;font-size:10px;color:var(--muted);z-index:35}
+:focus-visible{outline:3px solid var(--acc);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.slide.on .inner>*{animation:none}}
+</style></head><body>
+<div id="stage"><div id="ticks"></div><div id="counter"></div><div id="slides"></div>
+<div class="zone" id="prevZ" role="button" aria-label="Previous"></div>
+<div class="zone" id="nextZ" role="button" aria-label="Next"></div>
+<div id="hint">Tap to advance</div></div>
+<script>
+const D={"teams": [{"name": "I think Yammamoto likes you", "place": 1, "idx": 5, "rec": "143-102-19", "pct": ".578", "exprec": "134-114-16", "luck": 9.5, "bestWk": {"name": "I think Yammamoto likes you", "wk": 16, "exp": {"w": 8.6, "l": 2.6, "t": 0.9}, "act": {"w": 8, "l": 4, "t": 0}, "opp": "Pete Malonso - White Iverson", "oppStats": {"R": "32", "HR": "13", "RBI": "35", "SB": "2", "AVG": ".279", "OPS": ".859", "W": "5", "SV": "1", "K": "74", "ERA": "3.61", "WHIP": "1.24", "QS": "8"}, "oppAct": {"w": 4, "l": 8, "t": 0}, "stats": {"R": "33", "HR": "11", "RBI": "38", "SB": "3", "AVG": ".257", "OPS": ".770", "W": "7", "SV": "5", "K": "87", "ERA": "2.63", "WHIP": "0.91", "QS": "6"}}, "ranks": [5, 9, 7, 5, 1, 3, 2, 10, 2, 1, 7, 6, 3, 5, 3, 2, 1, 4, 5, 6, 6, 4], "stand": [6, 5, 4, 4, 3, 2, 1, 2, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "n1": 3, "n10": 1, "volRank": 9, "catRank": {"R": 3, "HR": 1, "RBI": 1, "SB": 10, "AVG": 4, "OPS": 3, "W": 8, "SV": 1, "K": 9, "ERA": 5, "WHIP": 1, "QS": 6}, "catScore": {"R": 4.95, "HR": 4.18, "RBI": 4.3, "SB": 6.95, "AVG": 5.34, "OPS": 4.73, "W": 6.55, "SV": 3.09, "K": 6.98, "ERA": 5.3, "WHIP": 3.66, "QS": 6.05}, "catRec": {"R": "12-9-1", "HR": "14-7-1", "RBI": "14-5-3", "SB": "6-15-1", "AVG": "10-12-0", "OPS": "13-9-0", "W": "9-8-5", "SV": "18-0-4", "K": "9-11-2", "ERA": "13-9-0", "WHIP": "15-7-0", "QS": "10-10-2"}, "bestCat": "SV", "worstCat": "K", "bestAct": {"name": "I think Yammamoto likes you", "wk": 10, "exp": {"w": 8.1, "l": 3.1, "t": 0.8}, "act": {"w": 10, "l": 1, "t": 1}, "opp": "Big Dumpers", "stats": {"R": "35", "HR": "9", "RBI": "25", "SB": "4", "AVG": ".312", "OPS": ".941", "W": "6", "SV": "6", "K": "78", "ERA": "1.73", "WHIP": "0.80", "QS": "5"}}, "sameWeek": false}, {"name": "South Side Samurai", "place": 2, "idx": 2, "rec": "130-117-17", "pct": ".525", "exprec": "130-116-18", "luck": -0.4, "bestWk": {"name": "South Side Samurai", "wk": 9, "exp": {"w": 9.2, "l": 2.3, "t": 0.4}, "act": {"w": 8, "l": 3, "t": 1}, "opp": "I think Yammamoto likes you", "oppStats": {"R": "36", "HR": "10", "RBI": "36", "SB": "1", "AVG": ".217", "OPS": ".695", "W": "6", "SV": "4", "K": "66", "ERA": "3.41", "WHIP": "1.01", "QS": "6"}, "oppAct": {"w": 3, "l": 8, "t": 1}, "stats": {"R": "37", "HR": "12", "RBI": "42", "SB": "2", "AVG": ".256", "OPS": ".838", "W": "5", "SV": "3", "K": "72", "ERA": "2.75", "WHIP": "1.12", "QS": "6"}}, "ranks": [3, 1, 9, 2, 5, 3, 1, 7, 1, 6, 10, 3, 5, 9, 9, 9, 9, 9, 3, 3, 4, 8], "stand": [4, 4, 6, 5, 5, 4, 3, 4, 3, 1, 3, 3, 3, 3, 2, 3, 3, 4, 3, 4, 2, 2], "n1": 3, "n10": 1, "volRank": 1, "catRank": {"R": 5, "HR": 5, "RBI": 8, "SB": 4, "AVG": 10, "OPS": 6, "W": 2, "SV": 4, "K": 5, "ERA": 2, "WHIP": 5, "QS": 2}, "catScore": {"R": 5.43, "HR": 5.43, "RBI": 6.18, "SB": 5.61, "AVG": 6.39, "OPS": 5.82, "W": 4.05, "SV": 4.86, "K": 4.89, "ERA": 4.82, "WHIP": 5.7, "QS": 3.95}, "catRec": {"R": "10-11-1", "HR": "11-10-1", "RBI": "10-11-1", "SB": "9-9-4", "AVG": "8-14-0", "OPS": "11-11-0", "W": "17-5-0", "SV": "6-10-6", "K": "11-10-1", "ERA": "13-9-0", "WHIP": "11-11-0", "QS": "13-6-3"}, "bestCat": "QS", "worstCat": "AVG", "bestAct": {"name": "South Side Samurai", "wk": 21, "exp": {"w": 6.6, "l": 4.9, "t": 0.6}, "act": {"w": 10, "l": 2, "t": 0}, "opp": "The Green Monsters", "stats": {"R": "42", "HR": "7", "RBI": "29", "SB": "7", "AVG": ".292", "OPS": ".809", "W": "4", "SV": "5", "K": "74", "ERA": "5.87", "WHIP": "1.59", "QS": "3"}}, "sameWeek": false}, {"name": "CHUZZ HOME", "place": 3, "idx": 9, "rec": "131-119-14", "pct": ".523", "exprec": "140-107-17", "luck": -9.2, "bestWk": {"name": "CHUZZ HOME", "wk": 21, "exp": {"w": 9.3, "l": 2.4, "t": 0.2}, "act": {"w": 10, "l": 2, "t": 0}, "opp": "Team Bruno", "oppStats": {"R": "39", "HR": "9", "RBI": "38", "SB": "4", "AVG": ".306", "OPS": ".838", "W": "3", "SV": "5", "K": "65", "ERA": "5.38", "WHIP": "1.57", "QS": "1"}, "oppAct": {"w": 2, "l": 10, "t": 0}, "stats": {"R": "43", "HR": "15", "RBI": "40", "SB": "10", "AVG": ".269", "OPS": ".858", "W": "6", "SV": "1", "K": "76", "ERA": "3.70", "WHIP": "1.22", "QS": "5"}}, "ranks": [10, 5, 4, 8, 4, 1, 2, 3, 7, 5, 6, 1, 1, 1, 5, 6, 3, 3, 8, 2, 1, 2], "stand": [8, 8, 9, 9, 8, 8, 7, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 5, 4, 3], "n1": 5, "n10": 1, "volRank": 6, "catRank": {"R": 2, "HR": 6, "RBI": 5, "SB": 1, "AVG": 6, "OPS": 7, "W": 3, "SV": 8, "K": 3, "ERA": 3, "WHIP": 4, "QS": 3}, "catScore": {"R": 4.86, "HR": 5.43, "RBI": 5.43, "SB": 2.73, "AVG": 5.43, "OPS": 5.93, "W": 4.09, "SV": 6.59, "K": 3.91, "ERA": 5.09, "WHIP": 5.64, "QS": 3.98}, "catRec": {"R": "11-9-2", "HR": "8-13-1", "RBI": "10-12-0", "SB": "16-5-1", "AVG": "7-15-0", "OPS": "9-13-0", "W": "12-6-4", "SV": "6-14-2", "K": "17-4-1", "ERA": "10-12-0", "WHIP": "10-12-0", "QS": "15-4-3"}, "bestCat": "SB", "worstCat": "SV", "bestAct": {"name": "CHUZZ HOME", "wk": 21, "exp": {"w": 9.3, "l": 2.4, "t": 0.2}, "act": {"w": 10, "l": 2, "t": 0}, "opp": "Team Bruno", "stats": {"R": "43", "HR": "15", "RBI": "40", "SB": "10", "AVG": ".269", "OPS": ".858", "W": "6", "SV": "1", "K": "76", "ERA": "3.70", "WHIP": "1.22", "QS": "5"}}, "sameWeek": true}, {"name": "The Green Monsters", "place": 4, "idx": 8, "rec": "125-116-23", "pct": ".517", "exprec": "122-123-18", "luck": 3.0, "bestWk": {"name": "The Green Monsters", "wk": 8, "exp": {"w": 8.9, "l": 2.8, "t": 0.3}, "act": {"w": 4, "l": 7, "t": 1}, "opp": "Woo Back Wednesday", "oppStats": {"R": "44", "HR": "12", "RBI": "31", "SB": "5", "AVG": ".228", "OPS": ".723", "W": "7", "SV": "1", "K": "75", "ERA": "3.16", "WHIP": "1.03", "QS": "7"}, "oppAct": {"w": 7, "l": 4, "t": 1}, "stats": {"R": "40", "HR": "11", "RBI": "36", "SB": "3", "AVG": ".269", "OPS": ".850", "W": "6", "SV": "0", "K": "74", "ERA": "2.99", "WHIP": "1.05", "QS": "7"}}, "ranks": [4, 3, 3, 7, 3, 9, 6, 1, 6, 7, 1, 2, 4, 2, 8, 4, 7, 8, 9, 8, 9, 9], "stand": [3, 2, 1, 1, 1, 1, 2, 1, 1, 3, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 3, 4], "n1": 2, "n10": 0, "volRank": 5, "catRank": {"R": 1, "HR": 4, "RBI": 2, "SB": 5, "AVG": 5, "OPS": 1, "W": 5, "SV": 6, "K": 8, "ERA": 10, "WHIP": 10, "QS": 5}, "catScore": {"R": 4.77, "HR": 4.77, "RBI": 4.52, "SB": 5.86, "AVG": 5.43, "OPS": 4.36, "W": 5.39, "SV": 5.68, "K": 6.68, "ERA": 6.68, "WHIP": 6.64, "QS": 5.43}, "catRec": {"R": "10-11-1", "HR": "13-8-1", "RBI": "15-6-1", "SB": "9-8-5", "AVG": "14-8-0", "OPS": "12-10-0", "W": "9-7-6", "SV": "7-10-5", "K": "7-14-1", "ERA": "10-12-0", "WHIP": "10-12-0", "QS": "9-10-3"}, "bestCat": "OPS", "worstCat": "ERA", "bestAct": {"name": "The Green Monsters", "wk": 2, "exp": {"w": 6.9, "l": 3.9, "t": 1.2}, "act": {"w": 10, "l": 1, "t": 1}, "opp": "Kyle Schwarbomb", "stats": {"R": "41", "HR": "9", "RBI": "27", "SB": "5", "AVG": ".250", "OPS": ".798", "W": "4", "SV": "3", "K": "63", "ERA": "4.27", "WHIP": "1.17", "QS": "3"}}, "sameWeek": false}, {"name": "Team Bruno", "place": 5, "idx": 0, "rec": "127-119-18", "pct": ".515", "exprec": "139-107-18", "luck": -12.4, "bestWk": {"name": "Team Bruno", "wk": 16, "exp": {"w": 8.8, "l": 2.1, "t": 1.1}, "act": {"w": 10, "l": 1, "t": 1}, "opp": "South Side Samurai", "oppStats": {"R": "29", "HR": "4", "RBI": "13", "SB": "3", "AVG": ".185", "OPS": ".552", "W": "8", "SV": "4", "K": "70", "ERA": "3.68", "WHIP": "1.21", "QS": "5"}, "oppAct": {"w": 1, "l": 10, "t": 1}, "stats": {"R": "43", "HR": "13", "RBI": "35", "SB": "7", "AVG": ".272", "OPS": ".811", "W": "4", "SV": "4", "K": "94", "ERA": "3.30", "WHIP": "1.15", "QS": "6"}}, "ranks": [1, 2, 2, 3, 10, 2, 8, 4, 3, 3, 9, 4, 2, 7, 1, 1, 4, 10, 4, 7, 5, 1], "stand": [2, 1, 2, 2, 2, 3, 4, 3, 2, 4, 5, 5, 5, 5, 5, 4, 4, 5, 4, 3, 5, 5], "n1": 4, "n10": 2, "volRank": 3, "catRank": {"R": 8, "HR": 3, "RBI": 3, "SB": 6, "AVG": 2, "OPS": 4, "W": 4, "SV": 3, "K": 2, "ERA": 4, "WHIP": 7, "QS": 4}, "catScore": {"R": 5.73, "HR": 4.73, "RBI": 4.55, "SB": 6.27, "AVG": 4.84, "OPS": 4.8, "W": 4.59, "SV": 4.16, "K": 3.57, "ERA": 5.14, "WHIP": 5.93, "QS": 5.07}, "catRec": {"R": "8-12-2", "HR": "8-13-1", "RBI": "11-10-1", "SB": "11-10-1", "AVG": "13-9-0", "OPS": "11-11-0", "W": "10-8-4", "SV": "12-6-4", "K": "13-8-1", "ERA": "12-10-0", "WHIP": "9-13-0", "QS": "9-9-4"}, "bestCat": "K", "worstCat": "SB", "bestAct": {"name": "Team Bruno", "wk": 16, "exp": {"w": 8.8, "l": 2.1, "t": 1.1}, "act": {"w": 10, "l": 1, "t": 1}, "opp": "South Side Samurai", "stats": {"R": "43", "HR": "13", "RBI": "35", "SB": "7", "AVG": ".272", "OPS": ".811", "W": "4", "SV": "4", "K": "94", "ERA": "3.30", "WHIP": "1.15", "QS": "6"}}, "sameWeek": true}, {"name": "Pete Malonso - White Iverson", "place": 6, "idx": 6, "rec": "127-121-16", "pct": ".511", "exprec": "125-120-19", "luck": 1.9, "bestWk": {"name": "Pete Malonso - White Iverson", "wk": 1, "exp": {"w": 7.9, "l": 3.6, "t": 0.6}, "act": {"w": 10, "l": 2, "t": 0}, "opp": "Elly De La Snooze", "oppStats": {"R": "11", "HR": "3", "RBI": "13", "SB": "2", "AVG": ".196", "OPS": ".582", "W": "2", "SV": "1", "K": "32", "ERA": "4.15", "WHIP": "0.96", "QS": "2"}, "oppAct": {"w": 2, "l": 10, "t": 0}, "stats": {"R": "22", "HR": "6", "RBI": "21", "SB": "7", "AVG": ".296", "OPS": ".921", "W": "0", "SV": "2", "K": "37", "ERA": "3.51", "WHIP": "0.82", "QS": "1"}}, "ranks": [2, 4, 4, 10, 7, 5, 10, 5, 3, 4, 2, 8, 10, 10, 4, 3, 2, 1, 10, 4, 2, 4], "stand": [1, 3, 3, 3, 4, 5, 6, 5, 5, 5, 4, 4, 4, 4, 4, 5, 5, 3, 5, 7, 7, 6], "n1": 1, "n10": 5, "volRank": 2, "catRank": {"R": 7, "HR": 2, "RBI": 4, "SB": 9, "AVG": 1, "OPS": 2, "W": 6, "SV": 7, "K": 4, "ERA": 7, "WHIP": 6, "QS": 7}, "catScore": {"R": 5.66, "HR": 4.66, "RBI": 4.64, "SB": 6.84, "AVG": 4.32, "OPS": 4.43, "W": 5.75, "SV": 6.25, "K": 4.41, "ERA": 6.0, "WHIP": 5.84, "QS": 6.11}, "catRec": {"R": "12-8-2", "HR": "12-8-2", "RBI": "14-8-0", "SB": "3-16-3", "AVG": "14-8-0", "OPS": "13-9-0", "W": "8-11-3", "SV": "9-10-3", "K": "14-8-0", "ERA": "10-12-0", "WHIP": "10-12-0", "QS": "8-11-3"}, "bestCat": "AVG", "worstCat": "SB", "bestAct": {"name": "Pete Malonso - White Iverson", "wk": 1, "exp": {"w": 7.9, "l": 3.6, "t": 0.6}, "act": {"w": 10, "l": 2, "t": 0}, "opp": "Elly De La Snooze", "stats": {"R": "22", "HR": "6", "RBI": "21", "SB": "7", "AVG": ".296", "OPS": ".921", "W": "0", "SV": "2", "K": "37", "ERA": "3.51", "WHIP": "0.82", "QS": "1"}}, "sameWeek": true}, {"name": "Big Dumpers", "place": 7, "idx": 4, "rec": "126-122-16", "pct": ".508", "exprec": "117-130-17", "luck": 8.7, "bestWk": {"name": "Big Dumpers", "wk": 4, "exp": {"w": 9.4, "l": 2.0, "t": 0.6}, "act": {"w": 11, "l": 0, "t": 1}, "opp": "Elly De La Snooze", "oppStats": {"R": "29", "HR": "10", "RBI": "36", "SB": "0", "AVG": ".229", "OPS": ".686", "W": "4", "SV": "3", "K": "59", "ERA": "3.86", "WHIP": "1.20", "QS": "2"}, "oppAct": {"w": 0, "l": 11, "t": 1}, "stats": {"R": "38", "HR": "13", "RBI": "36", "SB": "10", "AVG": ".269", "OPS": ".811", "W": "6", "SV": "6", "K": "60", "ERA": "2.64", "WHIP": "0.93", "QS": "6"}}, "ranks": [6, 8, 10, 1, 6, 8, 9, 9, 5, 8, 3, 5, 9, 3, 2, 7, 5, 6, 1, 1, 8, 7], "stand": [5, 6, 8, 6, 6, 6, 5, 6, 7, 8, 8, 7, 7, 7, 7, 7, 7, 7, 7, 6, 6, 7], "n1": 3, "n10": 1, "volRank": 4, "catRank": {"R": 6, "HR": 9, "RBI": 7, "SB": 2, "AVG": 7, "OPS": 9, "W": 9, "SV": 2, "K": 6, "ERA": 6, "WHIP": 8, "QS": 9}, "catScore": {"R": 5.64, "HR": 6.84, "RBI": 5.95, "SB": 3.18, "AVG": 5.91, "OPS": 6.36, "W": 6.84, "SV": 3.57, "K": 5.68, "ERA": 5.89, "WHIP": 5.95, "QS": 6.7}, "catRec": {"R": "11-10-1", "HR": "10-11-1", "RBI": "9-10-3", "SB": "16-3-3", "AVG": "9-13-0", "OPS": "11-11-0", "W": "6-12-4", "SV": "15-4-3", "K": "10-12-0", "ERA": "11-11-0", "WHIP": "10-12-0", "QS": "8-13-1"}, "bestCat": "SB", "worstCat": "W", "bestAct": {"name": "Big Dumpers", "wk": 4, "exp": {"w": 9.4, "l": 2.0, "t": 0.6}, "act": {"w": 11, "l": 0, "t": 1}, "opp": "Elly De La Snooze", "stats": {"R": "38", "HR": "13", "RBI": "36", "SB": "10", "AVG": ".269", "OPS": ".811", "W": "6", "SV": "6", "K": "60", "ERA": "2.64", "WHIP": "0.93", "QS": "6"}}, "sameWeek": true}, {"name": "Elly De La Snooze", "place": 8, "idx": 7, "rec": "109-132-23", "pct": ".456", "exprec": "102-141-21", "luck": 6.7, "bestWk": {"name": "Elly De La Snooze", "wk": 5, "exp": {"w": 7.8, "l": 3.6, "t": 0.7}, "act": {"w": 9, "l": 2, "t": 1}, "opp": "Woo Back Wednesday", "oppStats": {"R": "36", "HR": "7", "RBI": "25", "SB": "7", "AVG": ".235", "OPS": ".712", "W": "8", "SV": "2", "K": "60", "ERA": "5.25", "WHIP": "1.29", "QS": "5"}, "oppAct": {"w": 2, "l": 9, "t": 1}, "stats": {"R": "43", "HR": "16", "RBI": "50", "SB": "2", "AVG": ".251", "OPS": ".823", "W": "4", "SV": "2", "K": "67", "ERA": "4.00", "WHIP": "1.11", "QS": "6"}}, "ranks": [9, 6, 8, 9, 1, 7, 4, 6, 8, 9, 3, 10, 6, 4, 10, 8, 10, 7, 7, 9, 7, 3], "stand": [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 9, 9, 9, 8, 9, 8, 9, 9, 8, 8, 8, 8], "n1": 1, "n10": 3, "volRank": 8, "catRank": {"R": 9, "HR": 7, "RBI": 9, "SB": 7, "AVG": 9, "OPS": 8, "W": 7, "SV": 5, "K": 7, "ERA": 8, "WHIP": 9, "QS": 8}, "catScore": {"R": 6.11, "HR": 5.91, "RBI": 6.27, "SB": 6.27, "AVG": 6.27, "OPS": 6.34, "W": 6.2, "SV": 5.27, "K": 6.45, "ERA": 6.05, "WHIP": 6.32, "QS": 6.32}, "catRec": {"R": "10-11-1", "HR": "11-9-2", "RBI": "8-12-2", "SB": "8-11-3", "AVG": "11-11-0", "OPS": "9-13-0", "W": "7-10-5", "SV": "7-10-5", "K": "8-12-2", "ERA": "10-12-0", "WHIP": "10-12-0", "QS": "10-9-3"}, "bestCat": "SV", "worstCat": "K", "bestAct": {"name": "Elly De La Snooze", "wk": 11, "exp": {"w": 6.8, "l": 4.1, "t": 1.1}, "act": {"w": 11, "l": 0, "t": 1}, "opp": "Team Bruno", "stats": {"R": "32", "HR": "12", "RBI": "26", "SB": "4", "AVG": ".268", "OPS": ".773", "W": "5", "SV": "4", "K": "64", "ERA": "3.89", "WHIP": "1.15", "QS": "5"}}, "sameWeek": false}, {"name": "Kyle Schwarbomb", "place": 9, "idx": 3, "rec": "109-141-14", "pct": ".439", "exprec": "106-142-15", "luck": 2.6, "bestWk": {"name": "Kyle Schwarbomb", "wk": 19, "exp": {"w": 7.4, "l": 4.0, "t": 0.6}, "act": {"w": 6, "l": 6, "t": 0}, "opp": "South Side Samurai", "oppStats": {"R": "30", "HR": "9", "RBI": "25", "SB": "5", "AVG": ".243", "OPS": ".726", "W": "7", "SV": "3", "K": "64", "ERA": "1.45", "WHIP": "1.00", "QS": "7"}, "oppAct": {"w": 6, "l": 6, "t": 0}, "stats": {"R": "50", "HR": "11", "RBI": "46", "SB": "10", "AVG": ".282", "OPS": ".853", "W": "1", "SV": "0", "K": "54", "ERA": "3.18", "WHIP": "1.03", "QS": "3"}}, "ranks": [8, 10, 6, 4, 7, 9, 5, 8, 10, 10, 5, 7, 7, 7, 7, 5, 6, 2, 2, 10, 3, 10], "stand": [7, 9, 7, 8, 9, 9, 8, 9, 9, 9, 10, 10, 10, 10, 10, 10, 8, 8, 9, 9, 9, 9], "n1": 0, "n10": 5, "volRank": 7, "catRank": {"R": 10, "HR": 8, "RBI": 6, "SB": 3, "AVG": 3, "OPS": 5, "W": 10, "SV": 9, "K": 10, "ERA": 1, "WHIP": 2, "QS": 10}, "catScore": {"R": 6.5, "HR": 6.14, "RBI": 5.75, "SB": 4.93, "AVG": 4.95, "OPS": 5.02, "W": 7.77, "SV": 7.64, "K": 9.09, "ERA": 3.73, "WHIP": 4.16, "QS": 7.68}, "catRec": {"R": "8-12-2", "HR": "9-10-3", "RBI": "9-13-0", "SB": "10-8-4", "AVG": "15-7-0", "OPS": "14-8-0", "W": "3-17-2", "SV": "6-14-2", "K": "2-20-0", "ERA": "14-8-0", "WHIP": "15-7-0", "QS": "4-17-1"}, "bestCat": "ERA", "worstCat": "K", "bestAct": {"name": "Kyle Schwarbomb", "wk": 16, "exp": {"w": 5.7, "l": 5.4, "t": 0.9}, "act": {"w": 9, "l": 3, "t": 0}, "opp": "Woo Back Wednesday", "stats": {"R": "32", "HR": "9", "RBI": "35", "SB": "7", "AVG": ".238", "OPS": ".750", "W": "4", "SV": "2", "K": "32", "ERA": "2.41", "WHIP": "1.07", "QS": "5"}}, "sameWeek": false}, {"name": "Woo Back Wednesday", "place": 10, "idx": 1, "rec": "105-143-16", "pct": ".428", "exprec": "115-131-18", "luck": -9.7, "bestWk": {"name": "Woo Back Wednesday", "wk": 3, "exp": {"w": 9.0, "l": 2.1, "t": 0.9}, "act": {"w": 10, "l": 2, "t": 0}, "opp": "Big Dumpers", "oppStats": {"R": "33", "HR": "6", "RBI": "30", "SB": "6", "AVG": ".254", "OPS": ".717", "W": "1", "SV": "3", "K": "34", "ERA": "5.13", "WHIP": "1.17", "QS": "1"}, "oppAct": {"w": 2, "l": 10, "t": 0}, "stats": {"R": "35", "HR": "8", "RBI": "28", "SB": "9", "AVG": ".289", "OPS": ".824", "W": "6", "SV": "1", "K": "77", "ERA": "1.66", "WHIP": "0.91", "QS": "7"}}, "ranks": [7, 7, 1, 6, 9, 6, 7, 2, 8, 2, 8, 9, 8, 5, 6, 10, 7, 5, 5, 5, 10, 6], "stand": [9, 7, 5, 7, 7, 7, 9, 8, 8, 7, 7, 8, 8, 9, 8, 9, 10, 10, 10, 10, 10, 10], "n1": 1, "n10": 2, "volRank": 10, "catRank": {"R": 4, "HR": 10, "RBI": 10, "SB": 8, "AVG": 8, "OPS": 10, "W": 1, "SV": 10, "K": 1, "ERA": 9, "WHIP": 3, "QS": 1}, "catScore": {"R": 5.34, "HR": 6.91, "RBI": 7.41, "SB": 6.34, "AVG": 6.11, "OPS": 7.2, "W": 3.77, "SV": 7.89, "K": 3.34, "ERA": 6.32, "WHIP": 5.16, "QS": 3.7}, "catRec": {"R": "10-9-3", "HR": "7-14-1", "RBI": "4-17-1", "SB": "9-12-1", "AVG": "9-13-0", "OPS": "7-15-0", "W": "11-8-3", "SV": "4-12-6", "K": "15-7-0", "ERA": "7-15-0", "WHIP": "10-12-0", "QS": "12-9-1"}, "bestCat": "K", "worstCat": "SV", "bestAct": {"name": "Woo Back Wednesday", "wk": 3, "exp": {"w": 9.0, "l": 2.1, "t": 0.9}, "act": {"w": 10, "l": 2, "t": 0}, "opp": "Big Dumpers", "stats": {"R": "35", "HR": "8", "RBI": "28", "SB": "9", "AVG": ".289", "OPS": ".824", "W": "6", "SV": "1", "K": "77", "ERA": "1.66", "WHIP": "0.91", "QS": "7"}}, "sameWeek": true}], "best3": [{"name": "Big Dumpers", "wk": 4, "exp": {"w": 9.4, "l": 2.0, "t": 0.6}, "act": {"w": 11, "l": 0, "t": 1}, "opp": "Elly De La Snooze", "oppStats": {"R": "29", "HR": "10", "RBI": "36", "SB": "0", "AVG": ".229", "OPS": ".686", "W": "4", "SV": "3", "K": "59", "ERA": "3.86", "WHIP": "1.20", "QS": "2"}, "oppAct": {"w": 0, "l": 11, "t": 1}, "stats": {"R": "38", "HR": "13", "RBI": "36", "SB": "10", "AVG": ".269", "OPS": ".811", "W": "6", "SV": "6", "K": "60", "ERA": "2.64", "WHIP": "0.93", "QS": "6"}}, {"name": "CHUZZ HOME", "wk": 21, "exp": {"w": 9.3, "l": 2.4, "t": 0.2}, "act": {"w": 10, "l": 2, "t": 0}, "opp": "Team Bruno", "oppStats": {"R": "39", "HR": "9", "RBI": "38", "SB": "4", "AVG": ".306", "OPS": ".838", "W": "3", "SV": "5", "K": "65", "ERA": "5.38", "WHIP": "1.57", "QS": "1"}, "oppAct": {"w": 2, "l": 10, "t": 0}, "stats": {"R": "43", "HR": "15", "RBI": "40", "SB": "10", "AVG": ".269", "OPS": ".858", "W": "6", "SV": "1", "K": "76", "ERA": "3.70", "WHIP": "1.22", "QS": "5"}}, {"name": "South Side Samurai", "wk": 9, "exp": {"w": 9.2, "l": 2.3, "t": 0.4}, "act": {"w": 8, "l": 3, "t": 1}, "opp": "I think Yammamoto likes you", "oppStats": {"R": "36", "HR": "10", "RBI": "36", "SB": "1", "AVG": ".217", "OPS": ".695", "W": "6", "SV": "4", "K": "66", "ERA": "3.41", "WHIP": "1.01", "QS": "6"}, "oppAct": {"w": 3, "l": 8, "t": 1}, "stats": {"R": "37", "HR": "12", "RBI": "42", "SB": "2", "AVG": ".256", "OPS": ".838", "W": "5", "SV": "3", "K": "72", "ERA": "2.75", "WHIP": "1.12", "QS": "6"}}], "worst3": [{"name": "Kyle Schwarbomb", "wk": 10, "exp": {"w": 1.8, "l": 9.8, "t": 0.4}, "act": {"w": 2, "l": 9, "t": 1}, "opp": "South Side Samurai", "oppStats": {"R": "37", "HR": "8", "RBI": "29", "SB": "7", "AVG": ".236", "OPS": ".707", "W": "6", "SV": "4", "K": "56", "ERA": "1.82", "WHIP": "1.01", "QS": "6"}, "oppAct": {"w": 9, "l": 2, "t": 1}, "stats": {"R": "34", "HR": "8", "RBI": "24", "SB": "6", "AVG": ".261", "OPS": ".780", "W": "3", "SV": "0", "K": "53", "ERA": "6.64", "WHIP": "1.55", "QS": "2"}}, {"name": "Kyle Schwarbomb", "wk": 20, "exp": {"w": 2.0, "l": 9.8, "t": 0.2}, "act": {"w": 4, "l": 7, "t": 1}, "opp": "The Green Monsters", "oppStats": {"R": "30", "HR": "5", "RBI": "23", "SB": "4", "AVG": ".221", "OPS": ".629", "W": "2", "SV": "4", "K": "26", "ERA": "2.11", "WHIP": "0.96", "QS": "6"}, "oppAct": {"w": 7, "l": 4, "t": 1}, "stats": {"R": "30", "HR": "8", "RBI": "28", "SB": "1", "AVG": ".213", "OPS": ".664", "W": "1", "SV": "1", "K": "41", "ERA": "3.53", "WHIP": "1.29", "QS": "1"}}, {"name": "I think Yammamoto likes you", "wk": 8, "exp": {"w": 2.2, "l": 9.2, "t": 0.6}, "act": {"w": 1, "l": 9, "t": 2}, "opp": "Team Bruno", "oppStats": {"R": "31", "HR": "10", "RBI": "21", "SB": "5", "AVG": ".247", "OPS": ".754", "W": "3", "SV": "5", "K": "50", "ERA": "3.08", "WHIP": "0.95", "QS": "5"}, "oppAct": {"w": 9, "l": 1, "t": 2}, "stats": {"R": "27", "HR": "3", "RBI": "21", "SB": "1", "AVG": ".234", "OPS": ".649", "W": "2", "SV": "5", "K": "65", "ERA": "5.80", "WHIP": "1.40", "QS": "3"}}], "sweeps": [{"name": "Big Dumpers", "wk": 4, "exp": {"w": 9.4, "l": 2.0, "t": 0.6}, "act": {"w": 11, "l": 0, "t": 1}, "opp": "Elly De La Snooze", "oppStats": {"R": "29", "HR": "10", "RBI": "36", "SB": "0", "AVG": ".229", "OPS": ".686", "W": "4", "SV": "3", "K": "59", "ERA": "3.86", "WHIP": "1.20", "QS": "2"}, "oppAct": {"w": 0, "l": 11, "t": 1}, "stats": {"R": "38", "HR": "13", "RBI": "36", "SB": "10", "AVG": ".269", "OPS": ".811", "W": "6", "SV": "6", "K": "60", "ERA": "2.64", "WHIP": "0.93", "QS": "6"}, "marks": {"R": "W", "HR": "W", "RBI": "T", "SB": "W", "AVG": "W", "OPS": "W", "W": "W", "SV": "W", "K": "W", "ERA": "W", "WHIP": "W", "QS": "W"}, "oppMarks": {"R": "L", "HR": "L", "RBI": "T", "SB": "L", "AVG": "L", "OPS": "L", "W": "L", "SV": "L", "K": "L", "ERA": "L", "WHIP": "L", "QS": "L"}}, {"name": "Elly De La Snooze", "wk": 11, "exp": {"w": 6.8, "l": 4.1, "t": 1.1}, "act": {"w": 11, "l": 0, "t": 1}, "opp": "Team Bruno", "oppStats": {"R": "32", "HR": "8", "RBI": "24", "SB": "3", "AVG": ".260", "OPS": ".716", "W": "2", "SV": "1", "K": "49", "ERA": "3.93", "WHIP": "1.23", "QS": "4"}, "oppAct": {"w": 0, "l": 11, "t": 1}, "stats": {"R": "32", "HR": "12", "RBI": "26", "SB": "4", "AVG": ".268", "OPS": ".773", "W": "5", "SV": "4", "K": "64", "ERA": "3.89", "WHIP": "1.15", "QS": "5"}, "marks": {"R": "T", "HR": "W", "RBI": "W", "SB": "W", "AVG": "W", "OPS": "W", "W": "W", "SV": "W", "K": "W", "ERA": "W", "WHIP": "W", "QS": "W"}, "oppMarks": {"R": "T", "HR": "L", "RBI": "L", "SB": "L", "AVG": "L", "OPS": "L", "W": "L", "SV": "L", "K": "L", "ERA": "L", "WHIP": "L", "QS": "L"}}], "standings": [{"name": "I think Yammamoto likes you", "rec": "143-102-19", "pct": ".578", "exprec": "134-114-16", "luck": 9.5}, {"name": "South Side Samurai", "rec": "130-117-17", "pct": ".525", "exprec": "130-116-18", "luck": -0.4}, {"name": "CHUZZ HOME", "rec": "131-119-14", "pct": ".523", "exprec": "140-107-17", "luck": -9.2}, {"name": "The Green Monsters", "rec": "125-116-23", "pct": ".517", "exprec": "122-123-18", "luck": 3.0}, {"name": "Team Bruno", "rec": "127-119-18", "pct": ".515", "exprec": "139-107-18", "luck": -12.4}, {"name": "Pete Malonso - White Iverson", "rec": "127-121-16", "pct": ".511", "exprec": "125-120-19", "luck": 1.9}, {"name": "Big Dumpers", "rec": "126-122-16", "pct": ".508", "exprec": "117-130-17", "luck": 8.7}, {"name": "Elly De La Snooze", "rec": "109-132-23", "pct": ".456", "exprec": "102-141-21", "luck": 6.7}, {"name": "Kyle Schwarbomb", "rec": "109-141-14", "pct": ".439", "exprec": "106-142-15", "luck": 2.6}, {"name": "Woo Back Wednesday", "rec": "105-143-16", "pct": ".428", "exprec": "115-131-18", "luck": -9.7}], "xstandings": [{"name": "CHUZZ HOME", "exprec": "140-107-17", "xpct": ".563", "actual": 3, "move": 2}, {"name": "Team Bruno", "exprec": "139-107-18", "xpct": ".561", "actual": 5, "move": 3}, {"name": "I think Yammamoto likes you", "exprec": "134-114-16", "xpct": ".537", "actual": 1, "move": -2}, {"name": "South Side Samurai", "exprec": "130-116-18", "xpct": ".527", "actual": 2, "move": -2}, {"name": "Pete Malonso - White Iverson", "exprec": "125-120-19", "xpct": ".510", "actual": 6, "move": 1}, {"name": "The Green Monsters", "exprec": "122-123-18", "xpct": ".497", "actual": 4, "move": -2}, {"name": "Big Dumpers", "exprec": "117-130-17", "xpct": ".477", "actual": 7, "move": 0}, {"name": "Woo Back Wednesday", "exprec": "115-131-18", "xpct": ".468", "actual": 10, "move": 2}, {"name": "Kyle Schwarbomb", "exprec": "106-142-15", "xpct": ".432", "actual": 9, "move": 0}, {"name": "Elly De La Snooze", "exprec": "102-141-21", "xpct": ".428", "actual": 8, "move": -2}], "kings": {"R": {"team": "The Green Monsters", "score": 4.77, "rec": "10-11-1", "val": "35.7", "tot": "786", "exprec": "12-9-1"}, "HR": {"team": "I think Yammamoto likes you", "score": 4.18, "rec": "14-7-1", "val": "10.7", "tot": "235", "exprec": "13-7-2"}, "RBI": {"team": "I think Yammamoto likes you", "score": 4.3, "rec": "14-5-3", "val": "34.0", "tot": "749", "exprec": "14-8-1"}, "SB": {"team": "CHUZZ HOME", "score": 2.73, "rec": "16-5-1", "val": "8.3", "tot": "183", "exprec": "17-3-2"}, "AVG": {"team": "Pete Malonso - White Iverson", "score": 4.32, "rec": "14-8-0", "val": ".266", "tot": ".266", "exprec": "14-8-0"}, "OPS": {"team": "The Green Monsters", "score": 4.36, "rec": "12-10-0", "val": ".789", "tot": ".789", "exprec": "14-8-0"}, "W": {"team": "Woo Back Wednesday", "score": 3.77, "rec": "11-8-3", "val": "4.9", "tot": "108", "exprec": "13-5-4"}, "SV": {"team": "I think Yammamoto likes you", "score": 3.09, "rec": "18-0-4", "val": "4.2", "tot": "93", "exprec": "16-4-2"}, "K": {"team": "Woo Back Wednesday", "score": 3.34, "rec": "15-7-0", "val": "71.7", "tot": "1577", "exprec": "16-5-1"}, "ERA": {"team": "Kyle Schwarbomb", "score": 3.73, "rec": "14-8-0", "val": "3.30", "tot": "3.30", "exprec": "15-7-0"}, "WHIP": {"team": "I think Yammamoto likes you", "score": 3.66, "rec": "15-7-0", "val": "1.10", "tot": "1.10", "exprec": "15-6-1"}, "QS": {"team": "Woo Back Wednesday", "score": 3.7, "rec": "12-9-1", "val": "5.4", "tot": "119", "exprec": "14-5-3"}}, "example": {"team": "Team Bruno", "wk": 22, "exp": {"w": 7.3, "l": 4.2, "t": 0.4}, "act": {"w": 8, "l": 4, "t": 0}}, "catN": {"R": "Runs", "HR": "Home Runs", "RBI": "RBI", "SB": "Steals", "AVG": "Average", "OPS": "OPS", "W": "Wins", "SV": "Saves", "K": "Strikeouts", "ERA": "ERA", "WHIP": "WHIP", "QS": "Quality Starts"}, "dream": {"R": {"v": "50", "holders": [{"team": "Kyle Schwarbomb", "wk": 19}]}, "HR": {"v": "20", "holders": [{"team": "The Green Monsters", "wk": 12}]}, "RBI": {"v": "55", "holders": [{"team": "South Side Samurai", "wk": 4}]}, "SB": {"v": "18", "holders": [{"team": "CHUZZ HOME", "wk": 11}]}, "AVG": {"v": ".338", "holders": [{"team": "I think Yammamoto likes you", "wk": 6}]}, "OPS": {"v": "1.004", "holders": [{"team": "The Green Monsters", "wk": 12}]}, "W": {"v": "9", "holders": [{"team": "Pete Malonso - White Iverson", "wk": 21}]}, "SV": {"v": "8", "holders": [{"team": "I think Yammamoto likes you", "wk": 21}]}, "K": {"v": "96", "holders": [{"team": "Pete Malonso - White Iverson", "wk": 18}]}, "ERA": {"v": "1.45", "holders": [{"team": "South Side Samurai", "wk": 19}]}, "WHIP": {"v": "0.73", "holders": [{"team": "Big Dumpers", "wk": 2}]}, "QS": {"v": "10", "holders": [{"team": "Team Bruno", "wk": 19}]}}, "night": {"R": {"v": "14", "holders": [{"team": "Big Dumpers", "wk": 2}]}, "HR": {"v": "1", "holders": [{"team": "Pete Malonso - White Iverson", "wk": 14}]}, "RBI": {"v": "13", "holders": [{"team": "South Side Samurai", "wk": 16}]}, "SB": {"v": "0", "holders": [{"team": "Elly De La Snooze", "wk": 4}, {"team": "The Green Monsters", "wk": 14}, {"team": "South Side Samurai", "wk": 15}]}, "AVG": {"v": ".185", "holders": [{"team": "South Side Samurai", "wk": 16}]}, "OPS": {"v": ".552", "holders": [{"team": "South Side Samurai", "wk": 16}]}, "W": {"v": "0", "holders": [{"team": "I think Yammamoto likes you", "wk": 2}, {"team": "Woo Back Wednesday", "wk": 16}, {"team": "I think Yammamoto likes you", "wk": 18}]}, "SV": {"v": "0", "holders": [{"team": "Kyle Schwarbomb", "wk": 2}, {"team": "Pete Malonso - White Iverson", "wk": 2}, {"team": "Team Bruno", "wk": 3}, {"team": "Pete Malonso - White Iverson", "wk": 4}, {"team": "The Green Monsters", "wk": 6}, {"team": "Kyle Schwarbomb", "wk": 8}, {"team": "The Green Monsters", "wk": 8}, {"team": "Pete Malonso - White Iverson", "wk": 9}, {"team": "Woo Back Wednesday", "wk": 10}, {"team": "Kyle Schwarbomb", "wk": 10}, {"team": "Woo Back Wednesday", "wk": 11}, {"team": "Kyle Schwarbomb", "wk": 11}, {"team": "Kyle Schwarbomb", "wk": 12}, {"team": "South Side Samurai", "wk": 13}, {"team": "Kyle Schwarbomb", "wk": 13}, {"team": "CHUZZ HOME", "wk": 14}, {"team": "Kyle Schwarbomb", "wk": 15}, {"team": "Woo Back Wednesday", "wk": 16}, {"team": "CHUZZ HOME", "wk": 16}, {"team": "Kyle Schwarbomb", "wk": 19}, {"team": "Elly De La Snooze", "wk": 19}, {"team": "The Green Monsters", "wk": 19}]}, "K": {"v": "26", "holders": [{"team": "The Green Monsters", "wk": 20}]}, "ERA": {"v": "7.54", "holders": [{"team": "Pete Malonso - White Iverson", "wk": 4}]}, "WHIP": {"v": "1.83", "holders": [{"team": "The Green Monsters", "wk": 6}]}, "QS": {"v": "1", "holders": [{"team": "Big Dumpers", "wk": 3}, {"team": "Big Dumpers", "wk": 12}, {"team": "Woo Back Wednesday", "wk": 16}, {"team": "Kyle Schwarbomb", "wk": 20}, {"team": "Team Bruno", "wk": 21}]}}, "dist": {"R": [{"rank": 1, "team": "The Green Monsters", "score": 4.77}, {"rank": 2, "team": "CHUZZ HOME", "score": 4.86}, {"rank": 3, "team": "I think Yammamoto likes you", "score": 4.95}, {"rank": 4, "team": "Woo Back Wednesday", "score": 5.34}, {"rank": 5, "team": "South Side Samurai", "score": 5.43}, {"rank": 6, "team": "Big Dumpers", "score": 5.64}, {"rank": 7, "team": "Pete Malonso - White Iverson", "score": 5.66}, {"rank": 8, "team": "Team Bruno", "score": 5.73}, {"rank": 9, "team": "Elly De La Snooze", "score": 6.11}, {"rank": 10, "team": "Kyle Schwarbomb", "score": 6.5}], "HR": [{"rank": 1, "team": "I think Yammamoto likes you", "score": 4.18}, {"rank": 2, "team": "Pete Malonso - White Iverson", "score": 4.66}, {"rank": 3, "team": "Team Bruno", "score": 4.73}, {"rank": 4, "team": "The Green Monsters", "score": 4.77}, {"rank": 5, "team": "South Side Samurai", "score": 5.43}, {"rank": 6, "team": "CHUZZ HOME", "score": 5.43}, {"rank": 7, "team": "Elly De La Snooze", "score": 5.91}, {"rank": 8, "team": "Kyle Schwarbomb", "score": 6.14}, {"rank": 9, "team": "Big Dumpers", "score": 6.84}, {"rank": 10, "team": "Woo Back Wednesday", "score": 6.91}], "RBI": [{"rank": 1, "team": "I think Yammamoto likes you", "score": 4.3}, {"rank": 2, "team": "The Green Monsters", "score": 4.52}, {"rank": 3, "team": "Team Bruno", "score": 4.55}, {"rank": 4, "team": "Pete Malonso - White Iverson", "score": 4.64}, {"rank": 5, "team": "CHUZZ HOME", "score": 5.43}, {"rank": 6, "team": "Kyle Schwarbomb", "score": 5.75}, {"rank": 7, "team": "Big Dumpers", "score": 5.95}, {"rank": 8, "team": "South Side Samurai", "score": 6.18}, {"rank": 9, "team": "Elly De La Snooze", "score": 6.27}, {"rank": 10, "team": "Woo Back Wednesday", "score": 7.41}], "SB": [{"rank": 1, "team": "CHUZZ HOME", "score": 2.73}, {"rank": 2, "team": "Big Dumpers", "score": 3.18}, {"rank": 3, "team": "Kyle Schwarbomb", "score": 4.93}, {"rank": 4, "team": "South Side Samurai", "score": 5.61}, {"rank": 5, "team": "The Green Monsters", "score": 5.86}, {"rank": 6, "team": "Team Bruno", "score": 6.27}, {"rank": 7, "team": "Elly De La Snooze", "score": 6.27}, {"rank": 8, "team": "Woo Back Wednesday", "score": 6.34}, {"rank": 9, "team": "Pete Malonso - White Iverson", "score": 6.84}, {"rank": 10, "team": "I think Yammamoto likes you", "score": 6.95}], "AVG": [{"rank": 1, "team": "Pete Malonso - White Iverson", "score": 4.32}, {"rank": 2, "team": "Team Bruno", "score": 4.84}, {"rank": 3, "team": "Kyle Schwarbomb", "score": 4.95}, {"rank": 4, "team": "I think Yammamoto likes you", "score": 5.34}, {"rank": 5, "team": "The Green Monsters", "score": 5.43}, {"rank": 6, "team": "CHUZZ HOME", "score": 5.43}, {"rank": 7, "team": "Big Dumpers", "score": 5.91}, {"rank": 8, "team": "Woo Back Wednesday", "score": 6.11}, {"rank": 9, "team": "Elly De La Snooze", "score": 6.27}, {"rank": 10, "team": "South Side Samurai", "score": 6.39}], "OPS": [{"rank": 1, "team": "The Green Monsters", "score": 4.36}, {"rank": 2, "team": "Pete Malonso - White Iverson", "score": 4.43}, {"rank": 3, "team": "I think Yammamoto likes you", "score": 4.73}, {"rank": 4, "team": "Team Bruno", "score": 4.8}, {"rank": 5, "team": "Kyle Schwarbomb", "score": 5.02}, {"rank": 6, "team": "South Side Samurai", "score": 5.82}, {"rank": 7, "team": "CHUZZ HOME", "score": 5.93}, {"rank": 8, "team": "Elly De La Snooze", "score": 6.34}, {"rank": 9, "team": "Big Dumpers", "score": 6.36}, {"rank": 10, "team": "Woo Back Wednesday", "score": 7.2}], "W": [{"rank": 1, "team": "Woo Back Wednesday", "score": 3.77}, {"rank": 2, "team": "South Side Samurai", "score": 4.05}, {"rank": 3, "team": "CHUZZ HOME", "score": 4.09}, {"rank": 4, "team": "Team Bruno", "score": 4.59}, {"rank": 5, "team": "The Green Monsters", "score": 5.39}, {"rank": 6, "team": "Pete Malonso - White Iverson", "score": 5.75}, {"rank": 7, "team": "Elly De La Snooze", "score": 6.2}, {"rank": 8, "team": "I think Yammamoto likes you", "score": 6.55}, {"rank": 9, "team": "Big Dumpers", "score": 6.84}, {"rank": 10, "team": "Kyle Schwarbomb", "score": 7.77}], "SV": [{"rank": 1, "team": "I think Yammamoto likes you", "score": 3.09}, {"rank": 2, "team": "Big Dumpers", "score": 3.57}, {"rank": 3, "team": "Team Bruno", "score": 4.16}, {"rank": 4, "team": "South Side Samurai", "score": 4.86}, {"rank": 5, "team": "Elly De La Snooze", "score": 5.27}, {"rank": 6, "team": "The Green Monsters", "score": 5.68}, {"rank": 7, "team": "Pete Malonso - White Iverson", "score": 6.25}, {"rank": 8, "team": "CHUZZ HOME", "score": 6.59}, {"rank": 9, "team": "Kyle Schwarbomb", "score": 7.64}, {"rank": 10, "team": "Woo Back Wednesday", "score": 7.89}], "K": [{"rank": 1, "team": "Woo Back Wednesday", "score": 3.34}, {"rank": 2, "team": "Team Bruno", "score": 3.57}, {"rank": 3, "team": "CHUZZ HOME", "score": 3.91}, {"rank": 4, "team": "Pete Malonso - White Iverson", "score": 4.41}, {"rank": 5, "team": "South Side Samurai", "score": 4.89}, {"rank": 6, "team": "Big Dumpers", "score": 5.68}, {"rank": 7, "team": "Elly De La Snooze", "score": 6.45}, {"rank": 8, "team": "The Green Monsters", "score": 6.68}, {"rank": 9, "team": "I think Yammamoto likes you", "score": 6.98}, {"rank": 10, "team": "Kyle Schwarbomb", "score": 9.09}], "ERA": [{"rank": 1, "team": "Kyle Schwarbomb", "score": 3.73}, {"rank": 2, "team": "South Side Samurai", "score": 4.82}, {"rank": 3, "team": "CHUZZ HOME", "score": 5.09}, {"rank": 4, "team": "Team Bruno", "score": 5.14}, {"rank": 5, "team": "I think Yammamoto likes you", "score": 5.3}, {"rank": 6, "team": "Big Dumpers", "score": 5.89}, {"rank": 7, "team": "Pete Malonso - White Iverson", "score": 6.0}, {"rank": 8, "team": "Elly De La Snooze", "score": 6.05}, {"rank": 9, "team": "Woo Back Wednesday", "score": 6.32}, {"rank": 10, "team": "The Green Monsters", "score": 6.68}], "WHIP": [{"rank": 1, "team": "I think Yammamoto likes you", "score": 3.66}, {"rank": 2, "team": "Kyle Schwarbomb", "score": 4.16}, {"rank": 3, "team": "Woo Back Wednesday", "score": 5.16}, {"rank": 4, "team": "CHUZZ HOME", "score": 5.64}, {"rank": 5, "team": "South Side Samurai", "score": 5.7}, {"rank": 6, "team": "Pete Malonso - White Iverson", "score": 5.84}, {"rank": 7, "team": "Team Bruno", "score": 5.93}, {"rank": 8, "team": "Big Dumpers", "score": 5.95}, {"rank": 9, "team": "Elly De La Snooze", "score": 6.32}, {"rank": 10, "team": "The Green Monsters", "score": 6.64}], "QS": [{"rank": 1, "team": "Woo Back Wednesday", "score": 3.7}, {"rank": 2, "team": "South Side Samurai", "score": 3.95}, {"rank": 3, "team": "CHUZZ HOME", "score": 3.98}, {"rank": 4, "team": "Team Bruno", "score": 5.07}, {"rank": 5, "team": "The Green Monsters", "score": 5.43}, {"rank": 6, "team": "I think Yammamoto likes you", "score": 6.05}, {"rank": 7, "team": "Pete Malonso - White Iverson", "score": 6.11}, {"rank": 8, "team": "Elly De La Snooze", "score": 6.32}, {"rank": 9, "team": "Big Dumpers", "score": 6.7}, {"rank": 10, "team": "Kyle Schwarbomb", "score": 7.68}]}, "unit": {"R": "per wk", "HR": "per wk", "RBI": "per wk", "SB": "per wk", "AVG": "season", "OPS": "season", "W": "per wk", "SV": "per wk", "K": "per wk", "ERA": "season", "WHIP": "season", "QS": "per wk"}, "short": {"I think Yammamoto likes you": "Yammamoto", "South Side Samurai": "South Side", "CHUZZ HOME": "CHUZZ", "The Green Monsters": "Green Monsters", "Team Bruno": "Team Bruno", "Pete Malonso - White Iverson": "Pete Malonso", "Big Dumpers": "Big Dumpers", "Elly De La Snooze": "Elly", "Kyle Schwarbomb": "Schwarbomb", "Woo Back Wednesday": "Woo Back"}, "hit": ["R", "HR", "RBI", "SB", "AVG", "OPS"], "pit": ["W", "SV", "K", "ERA", "WHIP", "QS"], "cats": ["R", "HR", "RBI", "SB", "AVG", "OPS", "W", "SV", "K", "ERA", "WHIP", "QS"], "blurbs": {"I think Yammamoto likes you": ["BEST RECORD IN THE LEAGUE", "Ran away with it. Finished #1 in the league in saves (3.09), WHIP (3.66), homers (4.18) and RBI (4.3) \u2014 four categories outright. The one soft spot was strikeouts at #9, and it never once mattered."], "South Side Samurai": ["THE MOST HONEST TEAM", "Second place with the most deserved record in the league: expected and actual wins landed 0.4 apart. Also the streakiest team in the league week to week. Batting average was a real problem \u2014 dead last at 6.39 \u2014 and they won anyway."], "CHUZZ HOME": ["STARTED LAST, FINISHED THIRD", "Opened the season ranked dead last in the league, then finished with 5 weeks at #1 \u2014 more than anybody. That 2.73 in steals is the tightest grip any team had on any category all season. Saves were the hole, at #8."], "The Green Monsters": ["THE TIE MERCHANT", "Twenty-three tied categories, tied for most in the league, and those half-wins lifted them three whole seeds. #1 in the league in OPS (4.36) and runs (4.77). The ERA was dead last at 6.68, and somehow it never caught up with them."], "Team Bruno": ["ROBBED BY THE SCHEDULE", "Lost 12.4 wins to matchup luck alone, worst in the league by a distance. #2 in strikeouts and #3 in saves, with 4 weeks ranked first overall \u2014 and a fifth-place finish for the trouble."], "Pete Malonso - White Iverson": ["MOST IMPROVED AT RENAMING", "#1 in the league in batting average (4.32). Also ranked first overall in 1 week and dead last in 5 \u2014 the second-most volatile team in the league. Changed the team name five separate times, which is more identities than playoff wins."], "Big Dumpers": ["OWNER OF THE BEST WEEK", "Week 4 was the single best week anybody posted all season, and it turned into an 11-0-1 near-sweep. #2 in steals and #2 in saves. Picked up 8.7 free wins from a kind schedule, second-most in the league."], "Elly De La Snooze": ["FEAST OR FAMINE", "Ranked first overall exactly once all season, and dead last 3 times \u2014 and still produced one of only two near-sweeps anybody managed. Twenty-three ties, tied for the league lead. Best category was saves at #5, which tells you plenty."], "Kyle Schwarbomb": ["BEST ERA, WORST EVERYTHING ELSE", "#1 in the league in ERA (3.73) and #2 in WHIP. Also 9.09 in strikeouts \u2014 dead last, close to it every single week. The only team that never once ranked first overall in any week. Great arms, as long as nobody had to miss a bat."], "Woo Back Wednesday": ["THE FUNNIEST STAT OF THE SEASON", "Finished dead last while ranking #1 in the league in strikeouts (3.34), quality starts (3.7) AND wins (3.77). The best pitching staff in the league bolted to the worst record in the league. Saves were last at 7.89."]}, "tags": {"I think Yammamoto likes you": ["Fear Me", "Best record in the league"], "South Side Samurai": ["Honesty is the Best Policy", "Expected and actual wins only 0.4 apart"], "CHUZZ HOME": ["Cleveland Cavaliers", "Won the analytical championship"], "The Green Monsters": ["Marshawn Lynch", "I'm just here so I don't get fined"], "Team Bruno": ["Better Luck Next Time", "Lost 12.4 wins to the schedule, the most in the league."], "Pete Malonso - White Iverson": ["The Trade Machine", "\"Made CHUZZ HOME's Team\""], "Big Dumpers": ["The Biggest Dumper", "Ouch."], "Elly De La Snooze": ["Lost Season", "Great team name"], "Kyle Schwarbomb": ["Nightmares", "You won ERA!"], "Woo Back Wednesday": ["Zoinks Scoob!", "You lost. Game over."]}, "summary": {"R": 7465, "HR": 2070, "RBI": 6967, "SB": 1109, "K": 13629, "W": 855, "SV": 545, "QS": 970, "ties": 88, "deadlocks": 9, "blowouts": 12, "near": 2, "shutouts": 2, "leadChanges": 6, "leaders": 5, "bestCat": "18-0-4", "bestCatWho": "I think Yammamoto likes you", "bestCatC": "SV", "matchups": 110, "teamWeeks": 220}, "imgs": {"I think Yammamoto likes you": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAADwCAMAAAAJixmgAAAB/lBMVEXYoprXY1qhYF+jpZdiHheVJCfiWCZfWVhzbGfk15Xdn2yTkpLaKhs5Li5TIyUrHx9nsZWaW1vc3WGml3LaOER0a2qyxp+RHSStOkO8xMKcWyLolhtrRi1rHB81JRWvy3x+gIFoiX3IfYRtPUC6vsG8fYE5eF87tZuYf4DUvcF+wq2UPUGVgn703eIAAAD9/Pjz47auBhTv26jtNyfr05b2RjL26cf3uifythnIFyb8wSz89SrozI758hT689T27RPnMx3IFBvlLSOWBRC1EhzUJCv56irlLBzDCxnwVTO1FiPxx3DvWEn680z0xhXwZ1T06lDz2NC1t7b2qCkYBgX66ufst67Fx8aRFRn4lyz1xFHu2HPxd2nwl4upqKfyhXb0524qBgPtu0z61yj31xYUExOvKC3583DEDSJxJir69I3xysbzZym3CyHO1NPwrRnVNivwpZbydyiWl5MqJyf1iCnxxrVqR0aMiIX79rGvNDTmRhlsNjVuV1MwFgx3CREAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiuTkAAAAAgHRSTlP+/Pvz//j/a/7+/6//QmEy/6n//v6I/q39+/3//4///5n+///28///qv//nr//AP///v/////////+//////////7//v7+///+//7//v//////+//////6/v///////P///////xb+//7///7//v3//v///C7////9//7//////8aM5PcAADldSURBVHja5Z0JQ1PJtqj3TiBIQDhOrW175nvve/cNkOwkOwFCIAMhE4TAARmCQRSwQVpQREXt/utvrZqrdiWgYp977tutjLbyZc2rqlY5Y/+fPc7v+Y/tjZ2N3Lw5oDw3b948++8IvHc2cu/WLReeBr65e/fk7sncyd27d9kXbt26NzK6998DeHQESBvu3Tl4JvB5Qd7A2/wEfebm7hJ05B45+5cGvnnvFoqTkU5IXvbhi0olL78wBzJH6nsje/+KwCMDt9wThfRF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"}, "acc": ["blue", "cyan", "violet", "magenta", "amber", "blue", "cyan", "violet", "magenta", "amber"]};
+const VID=new URLSearchParams(location.search).has('vid');
+const STILL=new URLSearchParams(location.search).has('still');
+if(VID)document.body.classList.add('vid');
+if(STILL)document.body.classList.add('still');
+const f1=v=>Number(v).toFixed(1);
+
+
+// universal expected/actual record block
+function xr(exp,act,showDelta){
+  const d=act.w-exp.w, sign=d>0?'+':'';
+  const dcol=showDelta?`<div class="half dl"><div class="lb">Delta</div>
+    <div class="vv ${d>0?'pos':'neg'}">${sign}${f1(d)}</div></div>`:'';
+  return `<div class="xr"><div class="half exp"><div class="lb">Expected</div>
+    <div class="vv">${f1(exp.w)}-${f1(exp.l)}-${f1(exp.t)}</div></div>
+   <div class="half"><div class="lb">Actual</div><div class="vv">${act.w}-${act.l}-${act.t}</div></div>${dcol}</div>`;
+}
+function ordinal(n){return n+({1:'st',2:'nd',3:'rd'}[n%100>10&&n%100<20?0:n%10]||'th')}
+
+// season flow with placement callouts
+function rankColor(r){
+  const t=(r-1)/9;               // 0 best -> 1 worst
+  const h=(1-t)*128;             // 128 green -> 0 red
+  return {bg:`hsl(${h} 62% 92%)`,bd:`hsl(${h} 55% 42%)`,fg:`hsl(${h} 62% 27%)`};
+}
+function flow(r){
+  const n=r.length,W=680,H=196,PL=26,PR=26,PT=16,PB=30;
+  const x=i=>PL+i*(W-PL-PR)/(n-1), y=v=>PT+(v-1)*(H-PT-PB)/9;
+  const p=r.map((v,i)=>[x(i),y(v)]);
+  const line=p.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' ');
+  let g='';[1,5,10].forEach(v=>{g+=`<line x1="${PL}" y1="${y(v)}" x2="${W-PR}" y2="${y(v)}"
+    stroke="rgba(15,27,45,.13)" stroke-width="1"/>
+    <text x="${PL-7}" y="${y(v)+4}" text-anchor="end" font-family="DM Mono,monospace" font-size="10" fill="#66788F">${v}</text>`});
+  const dots=p.map((q,i)=>{const v=r[i],k=rankColor(v);
+    return `<g><circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="9" fill="${k.bg}" stroke="${k.bd}" stroke-width="1.6"/>
+      <text x="${q[0].toFixed(1)}" y="${(q[1]+3.3).toFixed(1)}" text-anchor="middle"
+      font-family="Space Grotesk,sans-serif" font-weight="700" font-size="10" fill="${k.fg}">${v}</text></g>`}).join('');
+  return `<div class="flow"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img"
+    aria-label="Placement each week, 1st is best">${g}
+    <path d="${line}" fill="none" stroke="var(--acc)" stroke-width="2.2" stroke-linejoin="round" opacity=".5"/>
+    ${dots}
+    <text x="${PL}" y="${H-8}" font-family="DM Mono,monospace" font-size="10" fill="#66788F">WEEK 1</text>
+    <text x="${W/2}" y="${H-8}" text-anchor="middle" font-family="DM Mono,monospace" font-size="10" fill="#66788F">WHERE YOU PLACED EACH WEEK</text>
+    <text x="${W-PR}" y="${H-8}" text-anchor="end" font-family="DM Mono,monospace" font-size="10" fill="#66788F">WEEK 22</text>
+    </svg></div>`;
+}
+// per-team category power grid
+function cgrid(t){
+  const cell=c=>{const r=t.catRank[c],k=rankColor(r);
+    return `<div class="cc" style="background:${k.bg};border-color:${k.bd}">
+      <div class="c">${c}</div><div class="r" style="color:${k.fg}">${ordinal(r)}</div>
+      <div class="s">${t.catScore[c]}</div></div>`};
+  const eg=ordinal(t.catRank.R), egs=t.catScore.R;
+  return `<div class="cgh">Power Score</div>
+    <div class="cglg"><span><b>${eg}</b> bigger number &mdash; your place in the league</span>
+      <span><b>${egs}</b> smaller number &mdash; your average weekly place, out of 10 (Power Score)</span></div>
+    <div class="cgl">Bats</div><div class="cg">${D.hit.map(cell).join('')}</div>
+    <div class="cgl">Arms</div><div class="cg">${D.pit.map(cell).join('')}</div>`;
+}
+function ptable(st,mk){
+  const row=(keys,tag)=>`<div class="ptr"><span class="ptt">${tag}</span><div class="pt">${keys.map(k=>{
+    const m=mk?`<em class="m${mk[k]}">${mk[k]}</em>`:'';
+    return `<div><div class="k">${k}</div><div class="v">${st[k]}${m}</div></div>`}).join('')}</div></div>`;
+  return row(D.hit,'Bats')+row(D.pit,'Arms');
+}
+function track(prog,id){
+  const n=prog.length,W=680,H=138,PL=26,PR=26,PT=16,PB=26;
+  const x=i=>PL+i*(W-PL-PR)/(n-1), y=v=>PT+(v-1)*(H-PT-PB)/9;
+  const pts=prog.map((v,i)=>[x(i),y(v)]);
+  const line=pts.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' ');
+  let g='';[1,5,10].forEach(v=>{g+=`<line x1="${PL}" y1="${y(v)}" x2="${W-PR}" y2="${y(v)}"
+    stroke="rgba(15,27,45,.13)" stroke-width="1"/>
+    <text x="${PL-7}" y="${y(v)+4}" text-anchor="end" font-family="DM Mono,monospace" font-size="10" fill="#66788F">${v}</text>`});
+  const marks=prog.map((v,i)=>i===0||i===n-1||v!==prog[i-1]);
+  const dots=pts.map((q,i)=>{
+    if(!marks[i]) return `<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="2.6" fill="#fff"
+      stroke="var(--acc)" stroke-width="1.4"/>`;
+    const last=i===n-1;
+    return `<g><circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="8.5"
+      fill="${last?'var(--acc)':'#fff'}" stroke="var(--acc)" stroke-width="1.8"/>
+      <text x="${q[0].toFixed(1)}" y="${(q[1]+3.3).toFixed(1)}" text-anchor="middle"
+      font-family="Space Grotesk,sans-serif" font-weight="700" font-size="9.5"
+      fill="${last?'#fff':'var(--acc)'}">${prog[i]}</text></g>`}).join('');
+  return `<div class="trk"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img"
+    aria-label="Standings position each week, finished ${ordinal(prog[n-1])}">${g}
+    <path d="${line}" fill="none" stroke="var(--acc)" stroke-width="2.2" stroke-linejoin="round"/>
+    ${dots}
+    <text x="${PL}" y="${H-7}" font-family="DM Mono,monospace" font-size="10" fill="#66788F">WEEK 1</text>
+    <text x="${W/2}" y="${H-7}" text-anchor="middle" font-family="DM Mono,monospace" font-size="10" fill="#66788F">STANDINGS POSITION EACH WEEK</text>
+    <text x="${W-PR}" y="${H-7}" text-anchor="end" font-family="DM Mono,monospace" font-size="10" fill="#66788F">WEEK 22</text>
+    </svg></div>`;
+}
+function rows(items){return `<div class="rows">${items.map(it=>
+ `<div class="rw ${it.cls||''}">${it.rk!==undefined?`<span class="rk">${it.rk}</span>`:''}
+  <span class="nm">${it.nm}</span><span class="${it.big?'vb':'vl'}">${it.vl}</span></div>`).join('')}</div>`}
+
+const S=[];
+S.push(['blue',`<div class="eyebrow">Fantasy Baseball 2026</div>
+ <h1>Regular<br>Season<br>Wrapped</h1>
+ <div class="caption" style="margin-top:12px">22 weeks &middot; 10 teams &middot; 12 categories</div>
+ <p class="body" style="margin-top:12px">Every category, every week, all season long. Here's how it actually went down.</p>`]);
+
+const ex=D.example;
+S.push(['violet',`<div class="eyebrow">The season in one number</div>
+ <div class="big">2,640</div>
+ <div class="caption">category battles decided</div>
+ <p class="body" style="margin-top:14px">12 cats, 10 teams, 22 weeks.<br>Each week came down to Pete Malonso refreshing his phone on a Monday morning at 2:59 am.</p>`]);
+
+S.push(['amber',`<div class="eyebrow">Best weeks of the season</div>
+ <h2>Absolute<br>Heaters</h2>
+ ${D.best3.map((w,i)=>`<div class="hl"><span class="em ${['','e2','e3'][i]}">&#128293;</span>
+   <div class="card"><div class="wk"><span class="nm">${w.name}</span></div>
+   <div class="mrow"><span>Week ${w.wk}</span><span>vs ${D.short[w.opp]}</span>
+     <span class="res">${w.act.w}-${w.act.l}-${w.act.t}</span>
+     <span class="exp">exp ${f1(w.exp.w)}-${f1(w.exp.l)}-${f1(w.exp.t)}</span></div>
+   ${ptable(w.stats)}</div></div>`).join('')}
+ <p class="body" style="margin-top:7px;font-size:11.5px">Ranked by expected record &mdash; how the week would have gone against all nine.</p>`]);
+
+S.push(['cyan',`<div class="eyebrow">Worst weeks of the season</div>
+ <h2>Rough<br>Outings</h2>
+ ${D.worst3.map((w,i)=>`<div class="hl"><span class="em ${['','e2','e3'][i]}">&#129482;</span>
+   <div class="card"><div class="wk"><span class="nm">${w.name}</span></div>
+   <div class="mrow"><span>Week ${w.wk}</span><span>vs ${D.short[w.opp]}</span>
+     <span class="res">${w.act.w}-${w.act.l}-${w.act.t}</span>
+     <span class="exp">exp ${f1(w.exp.w)}-${f1(w.exp.l)}-${f1(w.exp.t)}</span></div>
+   ${ptable(w.stats)}</div></div>`).join('')}`]);
+
+S.push(['violet',`<div class="eyebrow">The metric behind all of it</div>
+ <h2>Power<br>Score</h2>
+ <p class="body">Some weeks are long, some are short, so raw totals lie. Every week, in every category, all ten teams get ranked from 1st to 10th.</p>
+ <p class="body" style="margin-top:9px">Every week counts the same &mdash; one twenty-second of the total &mdash; no matter how many games it held. Average those 22 placements and you get your <b>Power Score</b> out of 10. Lower is better.</p>
+ <div class="card" style="text-align:center"><div class="prose">
+  <b>${D.short[D.kings.SB.team]}</b> averaged a place of <span class="a">${D.kings.SB.score} out of 10</span> in steals,
+  every week, across 22 weeks &mdash; a <span class="a">${D.kings.SB.score} PS</span>, the most dominant single category anyone had all season.</div></div>
+`]);
+
+S.push(['violet',`<div class="eyebrow">Who owned each category</div>
+ <h2>Category<br>Kings</h2>
+ <div class="khead"><span></span><span>Power Score scale &middot; 1 &rarr; 10</span><span>Power<br>Score</span><span>Actual</span><span>xRecord</span></div>
+ ${['hit','pit'].map(g=>`<div class="ksec">${g==='hit'?'Bats':'Arms'}</div>`+
+   D[g].map(cx=>{const k=D.kings[cx],ds=D.dist[cx];
+    const pos=s=>((s-1)/9*100);
+    const ticks=ds.map(t=>{
+      const lbl = t.rank===1?'1st' : t.rank===5?'5th' : t.rank===10?'10th' : '';
+      const cls = t.rank===1?'lead' : (lbl?'mark':'');
+      return `<u class="${cls}" style="left:${pos(t.score).toFixed(1)}%">${lbl?`<b>${lbl}</b>`:''}</u>`}).join('');
+    const lastT=ds[ds.length-1];
+    return `<div class="kb3"><span class="c">${cx}</span>
+     <span class="mid"><span class="tnrow"><span class="tn">${D.short[k.team]}</span>
+       <span class="tl">${D.short[lastT.team]}</span></span><span class="strip">${ticks}</span></span>
+     <span class="sc">${k.score}</span><span class="rc">${k.rec}</span><span class="rc xp">${k.exprec}</span></div>`}).join('')).join('')}
+ <p class="body" style="margin-top:6px;font-size:10.5px">Every row uses the same 1-to-10 Power Score scale, so the spread is comparable. Blue name is the category king, pink is last place.</p>`]);
+
+S.push(['cyan',`<div class="eyebrow">You only play 1 of 9 each week</div>
+ <h2>Expected<br>Record</h2>
+ <p class="body">Each week you win some of the 12 categories against one opponent. So replayed your week against all nine, and averaged the result.</p>
+ <div class="card"><div class="wk"><span class="nm">Example &middot; ${ex.team}</span><span class="wl">Week ${ex.wk}</span></div>
+  <div class="prose">Against their actual opponent they won <b>${ex.act.w} of the 12 categories</b>, going ${ex.act.w}-${ex.act.l}-${ex.act.t}.
+  Replayed against all nine teams, they averaged <span class="a">${f1(ex.exp.w)} category wins</span> per matchup,
+  <span class="a">${f1(ex.exp.l)} losses</span> per matchup and <span class="a">${f1(ex.exp.t)} ties</span> per matchup.</div>
+  <div style="text-align:center;margin-top:9px">${xr(ex.exp,ex.act,1)}</div>
+  <div class="prose" style="margin-top:8px">The delta is the callout: they won <b>${f1(ex.act.w-ex.exp.w)} more categories</b>
+  than an average matchup would have given them, so the schedule helped a little that week.</div></div>
+ <p class="body" style="margin-top:9px">Close together means you earned it. Far apart means the schedule did it.</p>`]);
+
+S.push(['blue',`<div class="eyebrow">What you got vs what you earned</div>
+ <h2>Schedule<br>Luck</h2>
+ ${(()=>{const ls=D.standings.map(s=>Math.abs(s.luck));
+   const mn=Math.min(...ls),mx=Math.max(...ls);
+   const sc=v=>mx===mn?0.5:(Math.abs(v)-mn)/(mx-mn);
+   return D.standings.slice().sort((a,b)=>b.luck-a.luck).map(s=>{
+     const t=sc(s.luck);
+     const e=Math.pow(t,0.9);
+     const pad=(6+e*5).toFixed(1), fs=(11.8+e*2.4).toFixed(1), ds=(15+e*7).toFixed(1);
+     const bw=(1.5+e*0.5).toFixed(1), sh=(2+e*1).toFixed(1), op=(0.85+e*0.15).toFixed(2);
+     return `<div class="lk" style="padding:${pad}px 11px;border-width:${bw}px;
+       box-shadow:${sh}px ${sh}px 0 rgba(15,27,45,.13);opacity:${op}">
+      <span class="nm" style="font-size:${fs}px">${s.name}</span>
+      <span class="pair"><span>actual <b>${s.rec}</b></span><span>expected <b>${s.exprec}</b></span></span>
+      <span class="d ${s.luck>0?'pos':'neg'}" style="font-size:${ds}px">${s.luck>0?'+':''}${f1(s.luck)}</span></div>`}).join('')})()}
+ <p class="body" style="margin-top:7px;font-size:11px">The number on the right is wins gained or lost purely from which opponent you drew.</p>`]);
+
+S.push(['cyan',`<div class="eyebrow">If nobody had a schedule</div>
+ <h2>Standings by<br>Expected Record</h2>
+ ${rows(D.xstandings.map((s,i)=>({rk:i+1,nm:s.name+(s.move?` <span class="${s.move>0?'pos':'neg'}" style="font-family:DM Mono,monospace;font-size:10px">${s.move>0?'&#9650;':'&#9660;'}${Math.abs(s.move)}</span>`:''),
+   vl:s.exprec+' &nbsp;'+s.xpct})))}
+ <p class="body" style="margin-top:8px;font-size:12px">Expected record replays every week against all nine opponents instead of one. Arrows show the move versus the real standings. Same six teams make the playoffs either way.</p>`]);
+
+S.push(['magenta',`<div class="eyebrow">Only two all season</div>
+ <h2>Near<br>Sweeps</h2>
+ <p class="body" style="margin-bottom:4px">Nobody ever took all twelve. Twice somebody got within one &mdash; and Elly is on both sides of it.</p>
+ ${D.sweeps.map(w=>`<div class="card"><div class="wk"><span class="nm">${w.name}</span>
+   <span class="wl">Week ${w.wk} &middot; won ${w.act.w}-${w.act.l}-${w.act.t}</span></div>
+   ${ptable(w.stats,w.marks)}
+   <div class="wk" style="margin-top:9px;opacity:.75"><span class="nm" style="font-size:12.5px">${w.opp}</span>
+   <span class="wl">went ${w.oppAct.w}-${w.oppAct.l}-${w.oppAct.t}</span></div>
+   ${ptable(w.oppStats,w.oppMarks)}</div>`).join('')}`]);
+
+const dnRow=(g,src,bad)=>D[g].map(cx=>{const x=src[cx],h=x.holders;
+  let who;
+  if(h.length===1) who=`${D.short[h[0].team]}<em>Week ${h[0].wk}</em>`;
+  else if(h.length<=5) who=h.map(y=>D.short[y.team]).join(', ')+
+    `<em>${h.map(y=>'W'+y.wk).join(', ')}</em>`;
+  else who=`${h.length} teams tied<em>too many to list</em>`;
+  return `<div class="dr ${bad?'bad':''}"><span class="c">${D.catN[cx]}</span>
+   <span class="v">${x.v}</span><span class="w">${who}</span></div>`}).join('');
+S.push(['amber',`<div class="eyebrow">Best single-week mark in each category</div>
+ <h2>The Dream<br>Week</h2>
+ <p class="body" style="font-size:11.5px">If one team put up every category high in the same week.</p>
+ <div class="ksec">Bats</div><div class="dl">${dnRow('hit',D.dream)}</div>
+ <div class="ksec">Arms</div><div class="dl">${dnRow('pit',D.dream)}</div>
+ <p class="body" style="margin-top:7px;font-size:10.5px">Weeks 1 and 17 are excluded &mdash; Week 1 was a short scoring period and Week 17 the extended All-Star week, so their totals aren't comparable. Ties share the record.</p>`]);
+
+S.push(['magenta',`<div class="eyebrow">Worst single-week mark in each category</div>
+ <h2>The Nightmare<br>Week</h2>
+ <p class="body" style="font-size:11.5px">Every category low, collected in one place.</p>
+ <div class="ksec">Bats</div><div class="dl">${dnRow('hit',D.night,1)}</div>
+ <div class="ksec">Arms</div><div class="dl">${dnRow('pit',D.night,1)}</div>
+ <p class="body" style="margin-top:7px;font-size:10.5px">Same exclusion &mdash; Weeks 1 and 17 left out for length. Ties are shared: a zero-save week happened 22 times.</p>`]);
+
+S.push(['blue',`<div class="eyebrow">Now the personal stuff</div>
+ <h1>Your<br>Season</h1>
+ <p class="body" style="margin-top:14px">All ten teams in order of finish — where you ranked in all twelve categories, your best week, and where you placed every single week.</p>`]);
+
+D.teams.forEach((t,ti)=>{
+  const [tag,msg]=D.tags[t.name];
+  const a=t.bestAct,b=t.bestWk;
+  const wkCard=(w,kind)=>`<div class="card wc ${kind}">
+    <div class="wcl">${kind==='act'?'Best actual week':'Best expected week'}</div>
+    <div class="wch"><span class="wn">Week ${w.wk}</span><span class="wo">vs ${D.short[w.opp]}</span></div>
+    <div class="wcm"><span class="pri">${kind==='act'?`${w.act.w}-${w.act.l}-${w.act.t}`:`${f1(w.exp.w)}-${f1(w.exp.l)}-${f1(w.exp.t)}`}</span>
+      <span class="sec">${kind==='act'?`exp ${f1(w.exp.w)}-${f1(w.exp.l)}-${f1(w.exp.t)}`:`went ${w.act.w}-${w.act.l}-${w.act.t}`}</span></div>
+    ${ptable(w.stats)}</div>`;
+  S.push([D.acc[ti],`<div class="th"><span class="place">#${t.place}</span>
+   <span class="rec">${t.rec} &nbsp; ${t.pct} &nbsp; <span class="${t.luck>0?'pos':'neg'}">${t.luck>0?'+':''}${f1(t.luck)} luck</span></span></div>
+   <h2 style="margin-bottom:6px">${t.name}</h2>
+   ${D.imgs[t.name]?`<div class="idrow"><div class="idtxt"><span class="tag">${tag}</span>
+       <div class="msg">${msg}</div></div>
+       <img class="tbadge" src="${D.imgs[t.name]}" alt=""></div>`
+     :`<span class="tag">${tag}</span><div class="msg">${msg}</div>`}
+   <div class="p2">${wkCard(a,'act')}${wkCard(b,'exp')}</div>
+   ${flow(t.ranks)}
+   ${track(t.stand,t.idx)}
+   ${cgrid(t)}`]);
+});
+
+const sm=D.summary;
+const scell=(v,l)=>`<div class="sc2"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+S.push(['blue',`<div class="eyebrow">That's the regular season</div>
+ <h2>The Season<br>By The Numbers</h2>
+ <div class="sgrid">
+  ${scell('2,640','category battles')}
+  ${scell(sm.matchups,'matchups')}
+  ${scell(sm.R.toLocaleString(),'runs')}
+  ${scell(sm.HR.toLocaleString(),'home runs')}
+  ${scell(sm.RBI.toLocaleString(),'RBI')}
+  ${scell(sm.SB.toLocaleString(),'stolen bases')}
+  ${scell(sm.K.toLocaleString(),'strikeouts')}
+  ${scell(sm.QS,'quality starts')}
+  ${scell(sm.W,'pitcher wins')}
+  ${scell(sm.SV,'saves')}
+  ${scell(sm.ties,'tied categories')}
+  ${scell(sm.deadlocks,'6-6 deadlocks')}
+  ${scell(sm.blowouts,'10+ cat wins')}
+  ${scell(sm.near,'near-sweeps')}
+  ${scell(sm.leaders,'teams led at some point')}
+ </div>
+ <p class="body" style="margin-top:11px;font-size:14px;font-weight:600">Good luck in the playoffs.</p>`]);
+
+const slidesEl=document.getElementById('slides');
+slidesEl.innerHTML=S.map(([acc,h],i)=>`<section class="slide" id="s${i}" style="--acc:var(--${acc})"><div class="inner">${h}</div></section>`).join('');
+const ticksEl=document.getElementById('ticks');
+ticksEl.innerHTML=S.map(()=>`<div class="tick"><i></i></div>`).join('');
+const counter=document.getElementById('counter'),hint=document.getElementById('hint');
+let cur=-1;
+function fit(el){
+  const inner=el.querySelector('.inner');inner.style.transform='none';
+  const cs=getComputedStyle(el);
+  const aH=el.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom)-6;
+  const aW=el.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-4;
+  const k=Math.min(1,aH/inner.scrollHeight,aW/inner.scrollWidth);
+  if(k<1)inner.style.transform='scale('+k.toFixed(4)+')';
+}
+function go(n){
+  if(n<0||n>=S.length)return;
+  if(cur>=0)document.getElementById('s'+cur).classList.remove('on');
+  cur=n;const el=document.getElementById('s'+cur);
+  el.classList.remove('on');void el.offsetWidth;el.classList.add('on');fit(el);
+  document.getElementById('stage').style.setProperty('--acc',getComputedStyle(el).getPropertyValue('--acc'));
+  [...ticksEl.children].forEach((t,i)=>{t.classList.toggle('done',i<cur);t.classList.toggle('now',i===cur)});
+  counter.textContent=(cur+1)+' / '+S.length;hint.style.opacity=cur===0?'1':'0';
+}
+window.addEventListener('resize',()=>{if(cur>=0)fit(document.getElementById('s'+cur))});
+document.fonts&&document.fonts.ready.then(()=>{if(cur>=0)fit(document.getElementById('s'+cur))});
+document.getElementById('nextZ').onclick=()=>go(cur+1);
+document.getElementById('prevZ').onclick=()=>go(cur-1);
+document.addEventListener('keydown',e=>{
+ if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();go(cur+1)}
+ if(e.key==='ArrowLeft')go(cur-1)});
+let tx=0;const st=document.getElementById('stage');
+st.addEventListener('touchstart',e=>{tx=e.changedTouches[0].clientX},{passive:true});
+st.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx;
+ if(Math.abs(dx)>52)go(dx<0?cur+1:cur-1)},{passive:true});
+go(0);
+</script></body></html>
