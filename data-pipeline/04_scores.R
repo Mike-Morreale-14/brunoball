@@ -7,7 +7,7 @@
 TARGET_SEASON <- 2026 # draft season; must match the Marcel projection files
 STATS_SEASON <- TARGET_SEASON - 1 # season the "2025 actual" and Savant inputs come from
 ADP_MAX <- 300 # players with FantasyPros ADP at or below this form the pool
-SMALL_PA <- 200 # hitters under this many 2025 PA get a "small 2025 sample" flag on deltas
+SMALL_PA <- 200 # hitters under this many 2025 PA get a "small 2025 sample" flag on gaps
 SMALL_IP <- 50 # pitchers under this many 2025 innings get the same flag
 
 
@@ -94,7 +94,8 @@ add_percentiles <- function(df, keys) {
   df
 }
 
-# Main, Raw and Underlying for each archetype, plus the delta, for the checks and printouts.
+# Score (main), 2025 Results (raw) and 2025 Skills (und) per archetype, plus the gap, for the
+# checks and printouts.
 all_scores <- function(df, group) {
   imap(weights[[group]], \(sets, arch) {
     out <- tibble(
@@ -105,7 +106,7 @@ all_scores <- function(df, group) {
     out
   }) |>
     bind_rows() |>
-    mutate(delta = und - raw) # Volatility has only Main, so its delta stays empty
+    mutate(gap = und - raw) # Speed and Volatility have only a Score, so their gap stays empty
 }
 
 # NaN (0/0, or a mean of nothing) would reach the site as text, so it becomes a plain gap.
@@ -225,8 +226,9 @@ hitters <- pool |>
     barrel = barrel_pct, ev = avg_ev, fb = fb_pct, xavg = xba, xiso = xslg - xba,
     proj_iso = iso, proj_hr = hr, proj_sb = sb, proj_avg = avg, proj_low_k = k_pct,
     proj_babip = (h - hr) / (ab - so - hr + sf),
-    # Raw uses rates, not counts, so the delta compares skill with results, not playing time.
-    act_hr_pa = a_hr / a_pa, act_sb_pa = a_sb / a_pa,
+    # 2025 Results uses rates, not counts, so the gap compares skill with results, not playing
+    # time.
+    act_hr_pa = a_hr / a_pa,
     act_hr = a_hr, act_sb = a_sb, act_avg = a_avg, act_iso = a_iso, act_babip = a_babip,
     act_low_k = a_k_pct, sprint = sprint_speed, ocontact = chase_contact_pct,
     contact = 100 - whiff_pct,
@@ -264,9 +266,9 @@ relievers <- pool |>
 # ---- Reliability -------------------------------------------------------------
 
 REL <- weights$reliability
-if (REL$weights$consistency != 0) stop("Consistency isn't rebuilt; keep its weight at 0.")
+if (REL$weights$consistency != 0) stop("Consistency isn't computed; keep its weight at 0.")
 
-# The 2026 tool's percentile: share of the group strictly below the player, 0-100.
+# Reliability's percentile: share of the group strictly below the player, 0-100.
 pct_below <- function(x) js_round(100 * map_dbl(x, \(v) sum(x < v)) / (length(x) - 1))
 
 # Older seasons count less: weights e^(lambda * i) by position, oldest (i = 0) to newest.
@@ -280,7 +282,7 @@ recency <- function(hist, ids, field) {
     )
 }
 
-# Full marks through age 33, then a falling penalty, as in the 2026 tool.
+# Full marks through age 33, then a falling penalty.
 age_score <- function(age) {
   case_when(
     is.na(age) ~ 50, age <= 33 ~ 50, age == 34 ~ 40,
@@ -471,16 +473,15 @@ show_top <- function(df, label, col, n = 10) {
 }
 for (arch in c("pwr", "spd", "avg", "anc", "karm", "vol")) {
   show_top(
-    select(filter(scores, archetype == arch), name, main, raw, und, delta),
-    paste("Top 10 by Main:", arch), main
+    select(filter(scores, archetype == arch), name, main, raw, und, gap),
+    paste("Top 10 by Score:", arch), main
   )
 }
-# Speed has no delta on the site: its Underlying includes contact, so the gap isn't luck.
-deltas <- scores |>
-  filter(!archetype %in% weights$hide_delta, !is.na(delta)) |>
-  select(name, archetype, raw, und, delta, small_2025_sample)
-show_top(deltas, "Biggest positive deltas (Underlying above Raw)", delta)
-show_top(deltas, "Biggest negative deltas (Raw above Underlying)", -delta)
+gaps <- scores |>
+  filter(!is.na(gap)) |>
+  select(name, archetype, raw, und, gap, small_2025_sample)
+show_top(gaps, "Biggest positive gaps (Skills above Results)", gap)
+show_top(gaps, "Biggest negative gaps (Results above Skills)", -gap)
 
 if (!all(passed)) stop("Some checks failed; nothing was written.", call. = FALSE)
 

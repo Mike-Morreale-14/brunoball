@@ -32,7 +32,7 @@ Screenshots were taken at 1280 × 800 (laptop) and 390 px wide (phone).
 8. **How to use.** Opens this guide on GitHub in a new tab.
 9. **Search box.** Filters the list by player name as you type.
 10. **Player count.** Shows how many players are in the list now, out of the whole pool, with the share in brackets (for example `316/316 (100%)`). It updates whenever a filter, chip, search or Hide Taken changes the list.
-11. **Edition line.** The first line of the footer: "Rebuilt on free public data and my own Marcel projections."
+11. **Footer line.** The first line of the footer: "Built on free public data and projections."
 12. **Credits.** The data sources and their owners, with links: MLB Stats API and Baseball Savant (MLB Advanced Media), the Chadwick Baseball Bureau register (ODC-By), FantasyPros ADP and Tom Tango's Marcel. The last link goes to the brunoball repository.
 
 ---
@@ -52,8 +52,8 @@ The list holds every player with a FantasyPros ADP of 300 or better, **sorted by
 7. **Name.** Click anywhere on the card, apart from the buttons, to open the player page on the right.
 8. **Position · team · age.** Age is the 2026 season minus the birth year.
 9. **REL pill.** Reliability, 0–100: a blend of the player's recent playing time, his projected playing time and his age. The Score Dictionary explains it (see [section 4](#4-score-weights-and-sliders)).
-10. **Hitter score pills: PWR (Power), SPD (Speed), AVG.** These are the Main scores, 0–100, and the little bar under each number shows the same value. The colour is red below 34, yellow from 34 to 66 and green from 67 up.
-11. **Starting pitcher score pills: ANC (Anchor), K (K Arm), VOL (Volatility).** Same layout as for hitters. Volatility uses reversed colours: a high (risky) score is red and a low score is green.
+10. **Hitter score pills: PWR (Power), SPD (Speed), AVG.** Each is the player's score for that archetype, 0–100, and the little bar under each number shows the same value. The colour is red below 34, yellow from 34 to 66 and green from 67 up.
+11. **Starting pitcher score pills: ANC (Anchor), K (K Arm), VOL (Volatility).** Same layout as for hitters. The cards use these short labels; the player page, filters, My Team and the Score Dictionary use the full names. Volatility uses reversed colours: a high (risky) score is red and a low score is green.
 12. **Reliever pills: ERA and K.** Relievers have no scores, so these two pills show the Marcel 2026 projected ERA and strikeouts, with no bar or colour scale.
 13. **"No MLB history to project."** The player had no MLB time in 2023–25, so there's no Marcel projection and no score. He's still listed at his ADP.
 14. **Card colour.** The left edge and the tint show the player type: blue for hitters, orange for starting pitchers and green for relievers. The open player's card is enlarged and outlined in blue.
@@ -67,23 +67,28 @@ Click a card to open the player page on the right. It scrolls on its own, separa
 ![Player page, top](guide/3a-player-top.png)
 
 1. **Header.** Photo, name, position, team, age and exact ADP.
-2. **Score ovals.** REL (reliability) and the three Main scores, coloured like the list pills.
+2. **Score ovals.** REL (reliability) and the three archetype scores, coloured like the list pills.
 3. **2025 Stats / 2026 Marcel Projections.** Two rows: the player's 2025 MLB line and his Marcel projection for 2026, in the same columns. For hitters: PA, HR, R, RBI, SB, AVG, OPS. For starters: IP, QS, K, ERA, WHIP, K/9. If he didn't play in MLB in 2025, the 2025 row shows dashes.
 4. **Underlying Metrics (Baseball Savant 2025).**
    - For hitters: average exit velocity (EV), max exit velocity, barrel %, hard-hit %, expected batting average (xBA), expected slugging (xSLG), sprint speed and K%.
    - For starters: fastball velocity, whiff %, K%, BB%, xERA, hard-hit % allowed and ground-ball %.
 5. **Reliability bar.** The reliability score (the REL oval) as a bar, labelled Score. What goes into it is explained in the Score Dictionary.
-6. **Archetype bars.**
-   - The thick bar is the **Main** score.
-   - The two thin bars under it are **Raw** (the brighter one) and **Underlying** (the fainter one).
-   - The number on the right is the Main score.
-7. **Delta (+/−).** Underlying minus Raw, shown after the Main score. It's green above +5, red below −5 and grey in between.
-8. **Small 2025 sample flag.** A yellow "small 2025 sample" tag appears next to every delta for a player with fewer than 200 PA (hitters) or 50 IP (pitchers) in 2025.
-9. **Speed has no delta.** The Speed bar shows Raw and Underlying but no +/− number. Underlying Speed includes contact rate, so the gap between the two isn't a luck signal.
-10. **"Reading this chart."** Opens and closes the explanation below.
-11. **Chart explanation.** A short description of Main, Raw, Underlying, the delta and the small-sample flag.
+6. **Archetype Scores.** One bar per archetype (Power, Speed and AVG for hitters), with the score on the right. These are the same scores as the ovals and the list pills.
 
-![Player page, bottom](guide/3b-player-bottom.png)
+Below the archetype bars, **2025 Results vs Skills** compares how each archetype scored on 2025 results with how it scored on 2025 Statcast skill measures.
+
+![2025 Results vs Skills](guide/3b-results-vs-skills.png)
+
+1. **Section title.** 2025 Results vs Skills.
+2. **Intro line.** "How each archetype scored on 2025 results versus 2025 Statcast skills. A positive gap means the skills were better than the results."
+3. **Rows.** One row per archetype: Power and AVG for hitters, Anchor and K Arm for starting pitchers.
+4. **Results.** The archetype scored on 2025 results as rates (for example home runs per plate appearance, batting average, ERA, quality starts per start), 0–100.
+5. **Skills.** The archetype scored on 2025 Statcast skill measures (for example barrel rate, exit velocity, expected batting average, xERA, whiff rate), 0–100.
+6. **Gap.** Skills minus Results. It's green above +5, red below −5 and grey in between.
+7. **Small 2025 sample flag.** A yellow "small 2025 sample" tag appears next to each Gap for a player with fewer than 200 PA (hitters) or 50 IP (pitchers) in 2025.
+8. **Note on what isn't included.** On a hitter's page: "Speed isn't included: the skill side is sprint speed, already in the Speed score, and steals depend more on whether a player runs than on luck." On a starting pitcher's page: "Volatility isn't included: it's already built from Statcast contact numbers, so there's no separate results version to compare against."
+
+![Player page, bottom](guide/3c-player-bottom.png)
 
 1. **Averages.** Totals over the seasons the player played within 2023–25, turned into rates. The label names those seasons: "2023-25 averages", "2024-25 averages" or "2025 averages" (or, with a gap, for example "2023, 2025 averages").
    - For hitters: HR, R, RBI and SB per 600 plate appearances, then AVG and OPS.
@@ -94,29 +99,31 @@ Click a card to open the player page on the right. It scrolls on its own, separa
    - For starters: games, starts, IP, QS, W, L, K, ERA, WHIP, K/9 and fastball velocity.
 4. **Score Dictionary & Weights.** Opens the weights panel. See [section 4](#4-score-weights-and-sliders).
 
-**Starting pitchers** have Anchor and K Arm bars, laid out like the hitters' three, plus a separate **Volatility** bar, where a higher score means a riskier pitcher. Volatility has a Main score only.
+**Starting pitchers** have Anchor and K Arm bars, laid out like the hitters' three, plus a separate **Volatility** bar, where a higher score means a riskier pitcher.
 
-![Starting pitcher scores](guide/3c-starter-volatility.png)
+![Starting pitcher scores](guide/3d-starter-volatility.png)
 
-1. Anchor and K Arm bars, with Raw, Underlying and the delta.
-2. Volatility bar (Main only; higher is riskier, so the colours are reversed).
+1. Anchor and K Arm bars.
+2. Volatility bar (higher is riskier, so the colours are reversed).
+3. 2025 Results vs Skills rows for Anchor and K Arm.
+4. The note on why Volatility isn't included.
 
 **Relievers** have no scores. Their page shows the note "No closer score: Marcel doesn't project saves." (with "Closer in 2025" for pitchers who closed in 2025), the 2025 Stats / 2026 Marcel Projections table with saves in place of quality starts (Marcel's saves column is a dash), the averages table and the year-by-year table.
 
-![Reliever page](guide/3d-reliever.png)
+![Reliever page](guide/3e-reliever.png)
 
 1. The no-score note.
 2. 2025 Stats / 2026 Marcel Projections table. Marcel has no saves projection, so that cell shows a dash.
 
 **Unscored players** (no MLB time in 2023–25) show only the header and a note explaining that there's no projection or score.
 
-![Unscored player](guide/3e-unscored.png)
+![Unscored player](guide/3f-unscored.png)
 
 1. "No MLB history to project" note.
 
 **Shohei Ohtani** appears twice, once as a hitter and once as a starting pitcher. FantasyPros gives him one ADP (1.3), which his hitter entry uses. Yahoo lists his pitching separately, so his pitcher entry uses an ADP of 50 that I set by hand. A note under his name says so.
 
-![Ohtani's ADP note](guide/3f-adp-note.png)
+![Ohtani's ADP note](guide/3g-adp-note.png)
 
 1. The ADP note.
 
@@ -124,31 +131,36 @@ Click a card to open the player page on the right. It scrolls on its own, separa
 
 ## 4. Score weights and sliders
 
-Open a hitter or starting pitcher, then click **Show Score Dictionary & Weights** at the bottom of the player page. Each archetype has one table, showing its Main, Raw and Underlying weights side by side. The Main sliders change that player group's Main weights (hitters, or starting pitchers) across the whole tool.
+Open a hitter or starting pitcher, then click **Show Score Dictionary & Weights** at the bottom of the player page. Each archetype has one table. Its first weight column, **Score**, drives the scores shown throughout the tool, and its sliders change that player group's weights (hitters, or starting pitchers) everywhere. The **2025 Results** and **2025 Skills** columns are the fixed weights behind the 2025 Results vs Skills section on the player page.
 
 ![Score weights](guide/4-weights.png)
 
 1. **Show / Hide Score Dictionary & Weights.** Opens and closes the panel.
-2. **Reset weights.** Puts every Main weight for this group back to its starting value. Every score returns to its default, and the saved weights are reset too.
-3. **How the scores work.** A short description of percentiles, Main, Raw, Underlying and the delta.
-4. **Archetype heading.** One table per score (Power, Speed and AVG for hitters; Anchor, K Arm and Volatility for starters).
-5. **Table columns.** Input, Main, Raw and Underlying. Every input used by any of the three scores has one row. A blank cell means that score doesn't use the input. Volatility has a Main column only, so its Raw and Underlying cells are blank.
+2. **Reset weights.** Puts every Score weight for this group back to its starting value. Every score returns to its default, and the saved weights are reset too.
+3. **How the scores work.** A short description of percentiles, the Score, 2025 Results, 2025 Skills and the gap.
+4. **Archetype heading.** One table per archetype (Power, Speed and AVG for hitters; Anchor, K Arm and Volatility for starters).
+5. **Table columns.** Input, Score, 2025 Results and 2025 Skills. Every input used by any of the three has one row. A blank cell means that column doesn't use the input.
 6. **Input.** The input's name, with what it is and where it comes from (2025 MLB, 2025 Savant or the Marcel projection) underneath.
-7. **Main weight slider.** Sets the input's weight in the Main score, from 0 to 50, and the number beside it shows the value. Weights don't need to add up to 100: each score divides by the total of its weights. Moving a slider updates, as you drag, the Main score in the list pills, the score ovals, the archetype bar and the My Team averages. A weight of 0 leaves that input out.
-8. **Raw weight.** Fixed; shown in the same number format as Main.
-9. **Underlying weight.** Fixed; shown in the same number format.
+7. **Score weight slider.** Sets the input's weight in the archetype score, from 0 to 50, and the number beside it shows the value. Weights don't need to add up to 100: each score divides by the total of its weights. Moving a slider updates, as you drag, the score in the list pills, the score ovals, the archetype bar and the My Team averages. A weight of 0 leaves that input out.
+8. **2025 Results weight.** Fixed; shown in the same number format as Score.
+9. **2025 Skills weight.** Fixed; shown in the same number format.
 10. **The list updates too.** Here the barrel weight was raised to 40, and Aaron Judge's PWR pill in the list updated at once.
+
+![Score-only tables](guide/4a-score-only.png)
+
+1. **Speed** (and **Volatility** for starters) has no 2025 Results vs Skills comparison.
+2. Its table has the Input and Score columns only.
 
 ![Reliability and ranges](guide/4b-ranges.png)
 
-1. **Reliability.** What goes into the REL score:
-   - recency of playing time (games for hitters, innings for starters, in each season played within 2023–25, with recent seasons counting more);
-   - Marcel's projected playing time;
-   - age;
-   - the weight of each input, and the note that the history now covers three seasons.
-2. **Ranges in the draft pool.** The heading, with the key Savant numbers for this group listed below it.
-3. **Colour legend.** Which colour stands for the 10th, 25th, 50th, 75th and 90th percentile (Bad, Poor, Avg, Good, Elite), in the same colours as the strips. Where lower is better, the strip runs the other way: the 10th percentile is Elite.
-4. **Range strip.** The five percentile values for one stat among the scored players in the pool. For stats where lower is better (a hitter's K% and whiff %; a pitcher's BB%, xERA, and hard-hit, barrel, zone-contact and HR-per-fly-ball rates allowed), the labels and colours run from Elite to Bad.
+1. **Reliability (0-100).** The heading, with one line under it: "Recency and projected playing time are percentiles within the player's group; age is a fixed scale."
+2. **Reliability table.** Input, weight and what it measures:
+   - Recency (45): games (or innings) per season in 2023-25, recent seasons weighted more;
+   - Projected playing time (25): Marcel's 2026 projected PA (or IP);
+   - Age (10): full credit through 33, less each year after.
+3. **Ranges in the draft pool.** The heading, with the key Savant numbers for this group listed below it.
+4. **Colour legend.** Which colour stands for the 10th, 25th, 50th, 75th and 90th percentile (Bad, Poor, Avg, Good, Elite), in the same colours as the strips.
+5. **Range strip.** The five percentile values for one stat among the scored players in the pool. For stats where lower is better (a hitter's K% and whiff %; a pitcher's BB%, xERA, and hard-hit, barrel, zone-contact and HR-per-fly-ball rates allowed), the labels and colours run from Elite to Bad.
 
 Weight changes are saved in your browser and come back when you reload. **Reset weights** also resets the saved weights for that group.
 
@@ -167,12 +179,12 @@ Weight changes are saved in your browser and come back when you reload. **Reset 
 4. **Player count.** Changes as you filter (here, 6 of 316).
 5. **Filters chip.** Opens and closes this panel. The chip is blue while the panel is open.
 6. **Reset All.** Clears every score range and team choice in the panel. It doesn't clear the position chips or the search.
-7. **Batter score ranges (PWR, SPD, AVG, REL).**
+7. **Batter score ranges (Power, Speed, AVG, REL).**
    - Each one is a two-handled slider from 0 to 100. Drag the handles to keep only players whose score falls in that range.
    - The label lights up in the score's colour while a range is set, and the numbers at each end show its limits.
    - Players who don't have that score (pitchers, for a hitter score) aren't filtered out by it.
    - REL applies to both hitters and starting pitchers.
-8. **Pitcher score ranges (ANC, K, VOL).** These work the same way for starting pitchers.
+8. **Pitcher score ranges (Anchor, K Arm, Volatility).** These work the same way for starting pitchers.
 9. **League (AL / NL).** Selects or clears all 15 teams in that league.
 10. **Division label** (East, Central, West). Selects or clears the five teams in that division.
 11. **Team button.** Selects or clears one team, and fills with the team colour when selected. With any team selected, the list shows only those teams.
@@ -195,7 +207,7 @@ Use **+** on a card for your own picks and **−** for players other teams take 
 1. **My Team (n).** Opens the panel; n is your number of picks.
 2. **Taken (n).** Every pick recorded, yours and others'.
 3. **Hide Taken.** See below.
-4. **Team averages.** The average Main score of your hitters (PWR, SPD, AVG) and your starters (ANC, K, VOL). Relievers aren't averaged, because they have no scores.
+4. **Team averages.** The average score of your hitters (Power, Speed, AVG) and your starters (Anchor, K Arm, Volatility). Relievers aren't averaged, because they have no scores.
 5. **Roster columns.** Batters, starters and relievers, with filled slots out of the total. The roster is C, 1B, 2B, 3B, SS, three OF and two UTIL; four SP and one UP (extra pitcher); three RP; then five bench spots.
 6. **Slot badge.**
    - Each player fills the slot for his position first; DH-only hitters and extra players at a position go to UTIL, and extra starters to UP.
@@ -269,15 +281,15 @@ Both columns have the same sections as the player page, apart from the Score Dic
 
 Every input to a score is a **percentile** from 0 to 100, worked out within one group of players in the draft pool: either the hitters or the starting pitchers. A 90 means the player is ahead of about 90% of that group on that input. Each score is a weighted average of the percentiles the player has. Inputs a player doesn't have (for example, no Savant data) are left out rather than counted as zero.
 
-- **Main** is the headline score in the pills and ovals. It mixes 2025 results, 2025 Baseball Savant skill measures and the 2026 Marcel projection. Its weights are the sliders in [section 4](#4-score-weights-and-sliders).
-- **Raw** uses 2025 results as rates, such as home runs per plate appearance, batting average, ERA and quality starts per start. It never uses totals, so how much a player played doesn't move it.
-- **Underlying** uses 2025 Savant skill measures, such as barrel rate, exit velocity, expected batting average, xERA, hard-hit rate allowed and whiff rate.
-- **Delta** is Underlying minus Raw.
-  - A positive number means the skill measures rank higher than the 2025 results; a negative number means the results rank higher than the skill measures.
-  - Speed has no delta, because its Underlying includes contact rate.
-  - Deltas for players with under 200 PA or 50 IP in 2025 carry the "small 2025 sample" flag.
-- **Volatility** (starting pitchers only) has just a Main score. It's built from home runs per fly ball, hard-hit rate and barrel rate allowed. A higher score means a riskier pitcher.
-- **Reliability** is a 0–100 blend of recent playing time, projected playing time and age, as in the 2026 tool, rebuilt on 2023–25 data. The Score Dictionary lists its inputs and weights.
+- **The archetype scores** (Power, Speed, AVG; Anchor, K Arm, Volatility) are the scores in the pills, ovals, bars, filters and My Team averages. Each mixes 2025 results, 2025 Baseball Savant skill measures and the 2026 Marcel projection. Their weights are the sliders in [section 4](#4-score-weights-and-sliders).
+- **2025 Results vs Skills** on the player page scores Power, AVG, Anchor and K Arm twice more:
+  - **Results** uses 2025 results as rates, such as home runs per plate appearance, batting average, ERA and quality starts per start. It never uses totals, so how much a player played doesn't move it.
+  - **Skills** uses 2025 Statcast skill measures, such as barrel rate, exit velocity, expected batting average, xERA, hard-hit rate allowed and whiff rate.
+  - **Gap** is Skills minus Results. A positive gap means the skill measures rank higher than the 2025 results; a negative gap means the results rank higher than the skill measures.
+  - Gaps for players with under 200 PA or 50 IP in 2025 carry the "small 2025 sample" flag.
+  - Speed isn't included: the skill side is sprint speed, already in the Speed score, and steals depend more on whether a player runs than on luck.
+- **Volatility** (starting pitchers only) is built from home runs per fly ball, hard-hit rate and barrel rate allowed. A higher score means a riskier pitcher. It isn't in 2025 Results vs Skills, because it's already built from Statcast contact numbers.
+- **Reliability** is a 0–100 blend of recent playing time, projected playing time and age. The Score Dictionary lists its inputs and weights.
 
 The [pipeline README](../data-pipeline/README.md) lists every input, its source and its weight.
 
@@ -285,7 +297,7 @@ The [pipeline README](../data-pipeline/README.md) lists every input, its source 
 
 These are saved in your browser on this device and come back when you reload or reopen the page:
 - **Your picks and other teams' picks**, so the draft board, My Team and the faded cards all come back.
-- **Main score weights**, for hitters and for starting pitchers.
+- **Score weights**, for hitters and for starting pitchers.
 - **The theme.**
 
 These reset on every reload: filters, team choices, position chips, search, Hide Taken, the open player, the comparison and the open or closed state of panels and toggles.

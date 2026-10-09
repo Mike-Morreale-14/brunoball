@@ -1,4 +1,4 @@
-// Draft Scout 2026, public edition. Plain JavaScript, no build step.
+// Draft Scout 2026. Plain JavaScript, no build step.
 // Reads data/hitters.json, data/sp.json, data/relievers.json and data/weights.json (written by
 // data-pipeline/04_scores.R) and computes every score in the browser, so the sliders work.
 'use strict';
@@ -7,7 +7,7 @@ const REPO_URL = 'https://github.com/Mike-Morreale-14/brunoball';
 const TEAMS_IN_LEAGUE = 10; // a pick number becomes round.pick with this many teams
 const STATS_YEAR = 2025;
 const SLIDER_MAX = 50;
-const STORE_KEY = 'ds-draft-2026'; // picks and Main weights, saved in the viewer's browser
+const STORE_KEY = 'ds-draft-2026'; // picks and Score weights, saved in the viewer's browser
 
 // ---- Fixed lookups ---------------------------------------------------------------------
 
@@ -44,7 +44,6 @@ const INPUTS = {
   sprint: ['Sprint speed', '2025 Savant sprint speed (feet per second).'],
   proj_sb: ['Projected SB', 'Marcel 2026 stolen bases.'],
   act_sb: ['2025 SB', '2025 stolen bases.'],
-  act_sb_pa: ['2025 SB per PA', '2025 stolen bases per plate appearance.'],
   contact: ['Contact %', '100 minus 2025 Savant whiff % (contact per swing).'],
   xavg: ['xBA', '2025 Savant expected batting average.'],
   proj_avg: ['Projected AVG', 'Marcel 2026 batting average.'],
@@ -110,8 +109,8 @@ const DIVISIONS = {
 };
 
 const SCORE_FILTERS = {
-  hitter: [['pwr', 'PWR', '#e0734a'], ['spd', 'SPD', '#3a9cc5'], ['avg', 'AVG', '#6aaa7a'], ['rel', 'REL', '#b0a488']],
-  sp: [['anc', 'ANC', '#3a9cc5'], ['karm', 'K', '#e0734a'], ['vol', 'VOL', '#6aaa7a']],
+  hitter: [['pwr', 'Power', '#e0734a'], ['spd', 'Speed', '#3a9cc5'], ['avg', 'AVG', '#6aaa7a'], ['rel', 'REL', '#b0a488']],
+  sp: [['anc', 'Anchor', '#3a9cc5'], ['karm', 'K Arm', '#e0734a'], ['vol', 'Volatility', '#6aaa7a']],
 };
 
 const ROSTER = {
@@ -127,7 +126,7 @@ const state = {
   players: [], byUid: new Map(), weights: null, mainW: null, ranges: {},
   selected: null, compare: null, search: '', pos: new Set(), teams: new Set(), filters: {},
   picks: [], hideGone: false, open: { filters: false, team: false, taken: false },
-  showHist: false, showDict: false, showLegend: false, mobileOpen: false,
+  showHist: false, showDict: false, mobileOpen: false,
 };
 
 // ---- Small helpers -----------------------------------------------------------------------
@@ -145,13 +144,13 @@ function tierColor(s, inverse = false) {
   const t = s < 34 ? 0 : s < 67 ? 1 : 2;
   return ['var(--tier-red)', 'var(--tier-yel)', 'var(--tier-grn)'][inverse ? 2 - t : t];
 }
-const deltaColor = (d) => (d > 5 ? '#6aaa7a' : d < -5 ? '#c05848' : 'var(--text-muted)');
+const gapColor = (d) => (d > 5 ? '#6aaa7a' : d < -5 ? '#c05848' : 'var(--text-muted)');
 
 function headshot(id) {
   return `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${id}/headshot/67/current`;
 }
 
-// Same rule as the 2026 tool: weighted mean of the percentiles a player has; missing inputs skipped.
+// Weighted mean of the percentiles a player has; missing inputs are skipped.
 function cs(p, w) {
   let total = 0;
   let sum = 0;
@@ -162,16 +161,20 @@ function cs(p, w) {
   return sum > 0 ? Math.round(total / sum) : null;
 }
 
+// Archetypes with 2025 Results (raw) and 2025 Skills (und) weights, so they have a gap.
+const hasGap = (group, key) => Boolean(state.weights[group][key].raw && state.weights[group][key].und);
+
 function scoresFor(p) {
   if (p.unscored_reason || !ARCH[p.group]) return null;
   const out = {};
   for (const a of ARCH[p.group]) {
     const sets = state.weights[p.group][a.key];
-    const main = cs(p, state.mainW[p.group][a.key]);
-    const raw = sets.raw ? cs(p, sets.raw) : null;
-    const und = sets.und ? cs(p, sets.und) : null;
-    const showDelta = sets.raw && sets.und && !state.weights.hide_delta.includes(a.key);
-    out[a.key] = { main, raw, und, delta: showDelta && raw != null && und != null ? und - raw : null };
+    const results = sets.raw ? cs(p, sets.raw) : null;
+    const skills = sets.und ? cs(p, sets.und) : null;
+    out[a.key] = {
+      main: cs(p, state.mainW[p.group][a.key]), results, skills,
+      gap: results != null && skills != null ? skills - results : null,
+    };
   }
   return out;
 }
@@ -352,9 +355,10 @@ function pill(label, val, color, bar = true) {
   return `<div class="score-pill"><span class="sp-label">${label}</span><span class="sp-val" style="color:${color}">${val ?? '–'}</span>${bar ? `<div class="sp-bar"><div class="sp-bar-fill" style="width:${val || 0}%;background:${color}"></div></div>` : ''}</div>`;
 }
 
-function scorePills(p, sc) {
+// List cards use the short labels to leave room for the name; My Team rows use the full names.
+function scorePills(p, sc, short = false) {
   if (!sc) return '';
-  return ARCH[p.group].map((a) => pill(a.short, sc[a.key].main, tierColor(sc[a.key].main, a.inverse))).join('');
+  return ARCH[p.group].map((a) => pill(short ? a.short : a.label, sc[a.key].main, tierColor(sc[a.key].main, a.inverse))).join('');
 }
 
 function rosterRow(p, slot, badgeCol, over = false) {
@@ -394,8 +398,8 @@ function renderTeam() {
     <div class="panel-head"><span class="panel-title">MY TEAM (${mine.length}/${ROSTER.batters.length + ROSTER.starters.length + ROSTER.relievers.length + ROSTER.bench})</span>
       <button class="btn-ghost" data-act="clear-picks">Clear</button></div>
     <div class="team-summary-row">
-      ${hit.length ? box('hit', 'HIT', '#3a7ca5', ARCH.hitter.map((a) => [a.short, avg(hit, (p) => scoresFor(p)[a.key].main)])) : ''}
-      ${sps.length ? box('sp', 'SP', '#e0734a', ARCH.sp.map((a) => [a.short, avg(sps, (p) => scoresFor(p)[a.key].main)])) : ''}
+      ${hit.length ? box('hit', 'HIT', '#3a7ca5', ARCH.hitter.map((a) => [a.label, avg(hit, (p) => scoresFor(p)[a.key].main)])) : ''}
+      ${sps.length ? box('sp', 'SP', '#e0734a', ARCH.sp.map((a) => [a.label, avg(sps, (p) => scoresFor(p)[a.key].main)])) : ''}
     </div>
     <div class="team-columns">
       ${col('BATTERS', '#3a7ca5', 'w40', r.batters, ROSTER.batters.length)}
@@ -453,7 +457,7 @@ function card(p) {
   let pills;
   if (p.unscored_reason) pills = '<div class="no-score">No MLB history to project</div>';
   else if (p.group === 'relievers') pills = pill('ERA', fD(p.proj_era, 2), 'var(--text-value)', false) + pill('K', fI(p.proj_so), 'var(--text-value)', false);
-  else pills = pill('REL', p.reliability, 'var(--accent-rel)') + '<div class="pill-divider"></div>' + scorePills(p, sc);
+  else pills = pill('REL', p.reliability, 'var(--accent-rel)') + '<div class="pill-divider"></div>' + scorePills(p, sc, true);
   return `<div class="${cls}" data-act="select" data-uid="${esc(p.uid)}">
     <div class="card-actions">
       <button class="btn-action btn-draft${pk?.type === 'draft' ? ' active' : ''}" data-act="draft" data-uid="${esc(p.uid)}" title="My pick">+</button>
@@ -485,17 +489,11 @@ function oval(label, s, kind) {
   return `<span class="oval" style="border-color:${c};color:${c};background:color-mix(in srgb, ${c} 15%, transparent)">${label} ${s ?? '–'}</span>`;
 }
 
-function bar(label, s, color, sub) {
-  const w = (v) => Math.max(2, Math.min(100, v || 0));
-  let extra = '';
-  if (sub && sub.delta != null) {
-    extra = `<span class="bar-delta" style="color:${deltaColor(sub.delta)}">${sub.delta > 0 ? '+' : ''}${sub.delta}</span>`;
-    if (sub.small) extra += '<span class="flag" title="Fewer than 200 PA or 50 IP in 2025">small 2025 sample</span>';
-  }
-  const layers = sub ? [sub.raw, sub.und].map((v, i) => (v == null ? '' : `<div class="pbar sub"><div class="pbar-fill" style="width:${w(v)}%;background:${color};opacity:${i ? 0.4 : 0.65}"></div></div>`)).join('') : '';
-  return `<div class="bar-row${sub ? ' layered' : ''}"><span class="bar-label">${label}</span>
-    <div class="bar-stack"><div class="pbar"><div class="pbar-fill" style="width:${w(s)}%;background:${color}"></div></div>${layers}</div>
-    <span class="bar-value">${s ?? '–'}${extra}</span></div>`;
+function bar(label, s, color) {
+  const w = Math.max(2, Math.min(100, s || 0));
+  return `<div class="bar-row"><span class="bar-label">${label}</span>
+    <div class="bar-stack"><div class="pbar"><div class="pbar-fill" style="width:${w}%;background:${color}"></div></div></div>
+    <span class="bar-value">${s ?? '–'}</span></div>`;
 }
 
 function table(cls, heads, rows) {
@@ -574,27 +572,30 @@ function spanAndHistory(p) {
 }
 
 function archetypes(p, sc) {
-  const isH = p.group === 'hitter';
   let html = `<div class="sec-label">Reliability</div>${bar('Score', p.reliability, tierColor(p.reliability))}
     <div class="sec-label">Archetype Scores</div>`;
-  for (const a of ARCH[p.group].filter((x) => !x.inverse)) {
-    const s = sc[a.key];
-    html += bar(a.label, s.main, a.color, { raw: s.raw, und: s.und, delta: s.delta, small: p.small_2025_sample });
-  }
-  html += `<button class="legend-toggle" data-act="toggle-legend">${state.showLegend ? '▾' : '▸'} Reading this chart</button>`;
-  if (state.showLegend) {
-    html += `<div class="legend">
-      <p>The top bar is the <b>Main</b> score: 2025 results, Savant skill measures and the Marcel projection, blended with the weights in the dictionary below. The thinner bars show its two parts:</p>
-      <p><span class="swatch" style="opacity:.65"></span><b>Raw</b>: 2025 results as rates (${isH ? 'HR per PA, ISO, AVG, K%' : 'ERA, WHIP, QS per start, K%'}), never counting stats, so playing time doesn't drive it.</p>
-      <p><span class="swatch" style="opacity:.4"></span><b>Underlying</b>: 2025 Savant skill measures (${isH ? 'barrels, exit velocity, xBA' : 'xERA, hard-hit and ground-ball rates, whiffs'}).</p>
-      <p>The +/- number is Underlying minus Raw. <span style="color:#6aaa7a;font-weight:700">Green</span> means the skills point to better results than he got; <span style="color:#c05848;font-weight:700">red</span> means his results ran ahead of his skills.
-      ${isH ? 'Speed shows no +/-: its Underlying includes contact rate, so the gap isn\'t a luck signal.' : ''}
-      "small 2025 sample" marks fewer than 200 PA or 50 IP in 2025.</p></div>`;
-  }
-  if (!isH) {
-    html += `<div class="sec-label">Volatility <small>(higher is riskier)</small></div>${bar('Vol', sc.vol.main, tierColor(sc.vol.main, true))}`;
+  for (const a of ARCH[p.group].filter((x) => !x.inverse)) html += bar(a.label, sc[a.key].main, a.color);
+  if (p.group === 'sp') {
+    html += `<div class="sec-label">Volatility <small>(higher is riskier)</small></div>${bar('Volatility', sc.vol.main, tierColor(sc.vol.main, true))}`;
   }
   return html;
+}
+
+// Each archetype's 2025 Results score next to its 2025 Skills score; Speed and Volatility have no pair.
+function resultsVsSkills(p, sc) {
+  const flag = p.small_2025_sample ? ' <span class="flag" title="Fewer than 200 PA or 50 IP in 2025">small 2025 sample</span>' : '';
+  const rows = ARCH[p.group].filter((a) => hasGap(p.group, a.key)).map((a) => {
+    const { results, skills, gap } = sc[a.key];
+    const g = gap == null ? '–' : `<span class="gap" style="color:${gapColor(gap)}">${gap > 0 ? '+' : ''}${gap}</span>`;
+    return [a.label, results ?? '–', skills ?? '–', g + flag];
+  });
+  const note = p.group === 'hitter'
+    ? "Speed isn't included: the skill side is sprint speed, already in the Speed score, and steals depend more on whether a player runs than on luck."
+    : "Volatility isn't included: it's already built from Statcast contact numbers, so there's no separate results version to compare against.";
+  return `<div class="sec-label">${STATS_YEAR} Results vs Skills</div>
+    <div class="sec-note">How each archetype scored on ${STATS_YEAR} results versus ${STATS_YEAR} Statcast skills. A positive gap means the skills were better than the results.</div>
+    ${table('pop rows gap-table', ['', 'Results', 'Skills', 'Gap'], rows)}
+    <div class="sec-note">${note}</div>`;
 }
 
 function profile(p, compact = false) {
@@ -612,13 +613,13 @@ function profile(p, compact = false) {
   }
   if (sc) {
     html += `<div class="ovals">${oval('REL', p.reliability, 'rel')}<span class="oval-divider"></span>
-      ${ARCH[p.group].map((a) => oval(a.short === 'K' ? 'K Arm' : a.short, sc[a.key].main, a.inverse ? 'inverse' : '')).join('')}</div>`;
+      ${ARCH[p.group].map((a) => oval(a.label, sc[a.key].main, a.inverse ? 'inverse' : '')).join('')}</div>`;
   } else {
     const role = season(p, STATS_YEAR)?.role ?? p.role;
     html += `<div class="note-box">No closer score: Marcel doesn't project saves.${role === 'CL' ? ` Closer in ${STATS_YEAR}.` : ''}</div>`;
   }
   html += statsTables(p);
-  if (sc) html += archetypes(p, sc);
+  if (sc) html += archetypes(p, sc) + resultsVsSkills(p, sc);
   html += spanAndHistory(p);
   return html + '</div>';
 }
@@ -632,39 +633,40 @@ function dictionary(p) {
     <span class="cat">HOW THE SCORES WORK</span>
     Every input is a percentile (0-100) within the ${g === 'hitter' ? 'hitters' : 'starting pitchers'} of the draft pool (FantasyPros ADP 300 or better).
     Each score is a weighted mean of the inputs a player has; missing inputs are skipped.<br>
-    <b>Main</b>: the headline score. Its weights are the sliders below and update every score live.<br>
-    <b>Raw</b>: 2025 results as rates. <b>Underlying</b>: 2025 Savant skill measures. Both have fixed weights.<br>
-    <b>Delta</b>: Underlying minus Raw.`;
-  // One table per archetype: every input once, with its Main (slider), Raw and Underlying weight.
+    <b>Score</b>: the archetype score shown throughout the tool. Its weights are the sliders below and update every score live.<br>
+    <b>${STATS_YEAR} Results</b> and <b>${STATS_YEAR} Skills</b>: fixed weights for the two scores compared in "${STATS_YEAR} Results vs Skills" on the player page.
+    Results uses ${STATS_YEAR} results as rates; Skills uses ${STATS_YEAR} Statcast skill measures. The gap is Skills minus Results.`;
+  // One table per archetype: every input once, with its Score (slider), Results and Skills weight.
   for (const a of ARCH[g]) {
     const sets = state.weights[g][a.key];
     const main = state.mainW[g][a.key];
+    const pair = hasGap(g, a.key);
     const keys = [...new Set([...Object.keys(main), ...Object.keys(sets.raw || {}), ...Object.keys(sets.und || {})])];
-    const fixed = (w) => (w == null ? '' : `<span class="wv">${w}</span>`);
+    const fixed = (w) => `<td>${w == null ? '' : `<span class="wv">${w}</span>`}</td>`;
     html += `<span class="cat">${a.label.toUpperCase()}${a.inverse ? ' (higher is riskier)' : ''}</span>
-      <table class="wt-table"><thead><tr><th>Input</th><th>Main</th><th>Raw</th><th>Underlying</th></tr></thead><tbody>
+      <table class="wt-table${pair ? '' : ' score-only'}"><thead><tr><th>Input</th><th>Score</th>${pair ? `<th>${STATS_YEAR} Results</th><th>${STATS_YEAR} Skills</th>` : ''}</tr></thead><tbody>
       ${keys.map((k) => {
         const [label, def] = INPUTS[k] || [k, ''];
-        const slider = k in main ? `<div class="wt-main"><input type="range" min="0" max="${SLIDER_MAX}" value="${main[k]}" aria-label="${esc(label)}: Main weight"
+        const slider = k in main ? `<div class="wt-main"><input type="range" min="0" max="${SLIDER_MAX}" value="${main[k]}" aria-label="${esc(label)}: Score weight"
           data-wgroup="${g}" data-warch="${a.key}" data-wkey="${k}"><span class="wv">${main[k]}</span></div>` : '';
-        return `<tr><td class="wt-name"><b>${label}</b><div class="wt-def">${def}</div></td><td>${slider}</td><td>${fixed(sets.raw?.[k])}</td><td>${fixed(sets.und?.[k])}</td></tr>`;
+        return `<tr><td class="wt-name"><b>${label}</b><div class="wt-def">${def}</div></td><td>${slider}</td>${pair ? fixed(sets.raw[k]) + fixed(sets.und[k]) : ''}</tr>`;
       }).join('')}</tbody></table>`;
   }
   const rw = state.weights.reliability.weights;
-  const who = g === 'hitter' ? 'games' : 'innings';
-  html += `<span class="cat">RELIABILITY</span>
-    A 0-100 blend of three inputs (weights in brackets), the same as in my 2026 draft tool:
-    <div class="def"><b>Recency</b> (${rw.recency}): ${who} in each season he played in 2023-25, averaged with more weight on recent seasons
-      (each season counts e<sup>${state.weights.reliability.recency_lambda}</sup> ≈ ${Math.exp(state.weights.reliability.recency_lambda).toFixed(2)} times the one before it), as a percentile within the group.</div>
-    <div class="def"><b>Projected playing time</b> (${rw.proj}): Marcel's 2026 projected ${g === 'hitter' ? 'plate appearances' : 'innings'}, as a percentile within the group.</div>
-    <div class="def"><b>Age</b> (${rw.age_rel}): 50 through age 33, 40 at 34, then 5 less for each year after (0 from 42).</div>
-    <div class="def">Consistency (how much playing time varied from season to season) has weight ${rw.consistency}, so it isn't used.
-      Percentiles here are the share of the group below the player. The 2026 tool's history went back to 2015; this version covers three seasons, 2023-25.</div>`;
+  const relRows = [
+    ['Recency', rw.recency, 'Games (or innings) per season in 2023-25, recent seasons weighted more'],
+    ['Projected playing time', rw.proj, "Marcel's 2026 projected PA (or IP)"],
+    ['Age', rw.age_rel, 'Full credit through 33, less each year after'],
+  ];
+  html += `<span class="cat">RELIABILITY (0-100)</span>
+    Recency and projected playing time are percentiles within the player's group; age is a fixed scale.
+    <table class="wt-table rel-table"><thead><tr><th>Input</th><th>Weight</th><th>What it measures</th></tr></thead><tbody>
+      ${relRows.map(([name, w, what]) => `<tr><td class="wt-name"><b>${name}</b></td><td><span class="wv">${w}</span></td><td class="wt-what">${what}</td></tr>`).join('')}
+    </tbody></table>`;
   const cols = ['#c05848', '#c09868', '#a89e8a', '#8ab87a', '#6aaa7a'];
   const tiers = ['Bad', 'Poor', 'Avg', 'Good', 'Elite'];
   html += `<span class="cat">RANGES IN THE DRAFT POOL (${STATS_YEAR})</span>10th, 25th, 50th, 75th and 90th percentile among scored ${g === 'hitter' ? 'hitters' : 'starters'}.
-    <div class="range-strip range-legend">${['10th', '25th', '50th', '75th', '90th'].map((q, i) => `<span style="background:${cols[i]}">${q} = ${tiers[i]}</span>`).join('')}</div>
-    <div class="def">Where lower is better, the strip runs the other way: the 10th percentile is Elite and the 90th is Bad.</div>`;
+    <div class="range-strip range-legend">${['10th', '25th', '50th', '75th', '90th'].map((q, i) => `<span style="background:${cols[i]}">${q} = ${tiers[i]}</span>`).join('')}</div>`;
   for (const [f, label, unit, lowGood] of GLOSSARY[g]) {
     const q = state.ranges[g][f];
     if (!q) continue;
@@ -759,7 +761,6 @@ const ACTIONS = {
   'reset-filters': () => { state.filters = {}; state.teams.clear(); renderFilters(); renderHeader(); renderList(); },
   'clear-picks': () => { state.picks = []; saveDraft(); renderAll(); },
   'toggle-hist': () => { state.showHist = !state.showHist; renderDetailBody(); },
-  'toggle-legend': () => { state.showLegend = !state.showLegend; renderDetailBody(); },
   'toggle-dict': () => { state.showDict = !state.showDict; renderDetail(); },
   'reset-weights': (_, g) => {
     for (const [a, sets] of Object.entries(state.weights[g])) state.mainW[g][a] = { ...sets.main };
@@ -780,7 +781,7 @@ document.addEventListener('input', (e) => {
   if (t.id === 'search') {
     state.search = t.value;
     renderList();
-  } else if (t.dataset.wkey) { // a Main weight slider: rescore everything, keep the slider in place
+  } else if (t.dataset.wkey) { // a Score weight slider: rescore everything, keep the slider in place
     state.mainW[t.dataset.wgroup][t.dataset.warch][t.dataset.wkey] = Number(t.value);
     t.nextElementSibling.textContent = t.value;
     saveDraft();

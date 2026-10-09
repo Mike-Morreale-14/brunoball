@@ -5,9 +5,9 @@ The scripts in this folder download public baseball data and turn it into the ta
 | Script | What it does |
 |---|---|
 | `01_pull.R` | Downloads raw data, one CSV per source and season. |
-| `02_clean.R` | Writes clean player, hitter, pitcher and league tables.  |
+| `02_clean.R` | Writes clean player, hitter, pitcher and league tables. |
 | `03_marcel.R` | Writes Marcel projections plus a quality-starts extension. |
-| `04_scores.R` | Matches the FantasyPros ADP list to player IDs |
+| `04_scores.R` | Matches the FantasyPros ADP list to player IDs, computes percentiles and scores, and writes the draft tool's data. |
 
 ## What `01_pull.R` downloads
 
@@ -121,7 +121,98 @@ The script prints the projected league rates next to the last season's, the top 
 - Relievers, closers included, are shown with their stats and no score. Marcel doesn't project saves.
 
 **Scores**
-tbd
+- **Archetypes:** Power, Speed and AVG for hitters; Anchor, K Arm and Volatility for starting pitchers. A higher Volatility means a riskier pitcher.
+- **Each score is a weighted average of percentiles.** A missing input is skipped and the other weights scale up, so it never counts as zero.
+- **Weights** live in [`weights.json`](weights.json), which this script and the site both read. They're my own judgement, not fitted to data. In the file, `main` is the Score (the site's sliders), `raw` is 2025 Results and `und` is 2025 Skills.
+- **The site files carry the percentiles, not the scores.** The site computes the scores in the browser; this script computes them only to check them.
+
+The Score is the one score per archetype the site shows everywhere. 2025 Results uses 2025 rates, never counting stats, so playing time doesn't drive it; 2025 Skills uses 2025 Statcast skill measures. Blank cells are inputs that column doesn't use.
+
+*Power*
+
+| Input | Source | Score | 2025 Results | 2025 Skills |
+|---|---|---|---|---|
+| Barrel % (`barrel`) | 2025 Savant | 25 | 20 | 40 |
+| Exit velocity (`ev`) | 2025 Savant | 20 | 15 | 30 |
+| ISO (`proj_iso`) | Marcel 2026 | 20 |  |  |
+| Fly-ball % (`fb`) | 2025 Savant | 10 | 5 | 10 |
+| HR (`proj_hr`) | Marcel 2026 | 15 |  |  |
+| HR (`act_hr`) | 2025 MLB | 10 |  |  |
+| HR per PA (`act_hr_pa`) | 2025 MLB |  | 35 |  |
+| ISO (`act_iso`) | 2025 MLB |  | 25 |  |
+| Expected ISO (xSLG − xBA) (`xiso`) | 2025 Savant |  |  | 20 |
+
+*Speed*
+
+| Input | Source | Score |
+|---|---|---|
+| Sprint speed (`sprint`) | 2025 Savant | 40 |
+| SB (`proj_sb`) | Marcel 2026 | 35 |
+| SB (`act_sb`) | 2025 MLB | 25 |
+
+*AVG*
+
+| Input | Source | Score | 2025 Results | 2025 Skills |
+|---|---|---|---|---|
+| xBA (`xavg`) | 2025 Savant | 20 |  | 35 |
+| AVG (`proj_avg`) | Marcel 2026 | 20 |  |  |
+| K% (lower is better) (`proj_low_k`) | Marcel 2026 | 15 |  |  |
+| Chase contact % (`ocontact`) | 2025 Savant | 15 | 20 | 20 |
+| BABIP (`proj_babip`) | Marcel 2026 | 15 |  |  |
+| AVG (`act_avg`) | 2025 MLB | 15 | 30 |  |
+| K% (lower is better) (`act_low_k`) | 2025 MLB |  | 30 | 30 |
+| BABIP (`act_babip`) | 2025 MLB |  | 20 |  |
+| Contact % (100 − whiff %) (`contact`) | 2025 Savant |  |  | 15 |
+
+*Anchor*
+
+| Input | Source | Score | 2025 Results | 2025 Skills |
+|---|---|---|---|---|
+| IP (`proj_ip`) | Marcel 2026 | 20 |  |  |
+| QS (`proj_qs`) | Marcel 2026 (quality-starts extension) | 20 |  |  |
+| ERA (lower is better) (`proj_low_era`) | Marcel 2026 | 20 |  |  |
+| WHIP (lower is better) (`proj_low_whip`) | Marcel 2026 | 15 |  |  |
+| xERA (lower is better) (`low_xera`) | 2025 Savant | 15 |  | 40 |
+| Hard-hit % allowed (lower is better) (`low_hard`) | 2025 Savant | 10 |  | 30 |
+| QS per start (`act_qs_gs`) | 2025 MLB game logs |  | 25 |  |
+| ERA (lower is better) (`act_low_era`) | 2025 MLB |  | 25 |  |
+| WHIP (lower is better) (`act_low_whip`) | 2025 MLB |  | 20 |  |
+| Ground-ball % (`gb`) | 2025 Savant |  |  | 30 |
+
+*K Arm*
+
+| Input | Source | Score | 2025 Results | 2025 Skills |
+|---|---|---|---|---|
+| Fastball velocity (`fbv`) | 2025 Savant | 25 | 25 | 35 |
+| K% (`act_kpct`) | 2025 MLB | 20 | 20 | 25 |
+| K (`proj_k`) | Marcel 2026 | 15 |  |  |
+| K/9 (`proj_k9`) | Marcel 2026 | 15 |  |  |
+| Whiff % (per swing) (`whiff`) | 2025 Savant | 15 |  | 25 |
+| Zone contact % allowed (lower is better) (`low_zcon`) | 2025 Savant | 10 |  | 15 |
+| K/9 (`act_k9`) | 2025 MLB |  | 25 |  |
+
+*Volatility*
+
+| Input | Source | Score |
+|---|---|---|
+| HR per fly ball allowed (`hrfb`) | 2025 Savant | 35 |
+| Hard-hit % allowed (`hard`) | 2025 Savant | 25 |
+| Barrel % allowed (`barrel_ag`) | 2025 Savant | 25 |
+
+**2025 Results vs Skills**
+- Shown on the player page for Power, AVG, Anchor and K Arm only.
+- **Gap** = Skills minus Results.
+- **Small-sample flag:** a player with fewer than 200 PA or 50 IP in 2025 has `small_2025_sample: true`, and the site marks each of his gaps "small 2025 sample".
+- Speed isn't included: the skill side is sprint speed, already in the Speed score, and steals depend more on whether a player runs than on luck.
+- Volatility isn't included: it's already built from Statcast contact numbers, so there's no separate results version to compare against.
+
+**Reliability** (0–100; the site shows only a summary). Hitters and starting pitchers are scored within their own group.
+- **Recency** (weight 45): games (hitters) or innings (starters) in each season the player played within 2023–25, averaged with weight e^(0.3 × i), where i = 0 for his oldest of those seasons and rises by 1 each season. Then a percentile.
+- **Projected playing time** (weight 25): Marcel 2026 PA (hitters) or IP (starters). Then a percentile.
+- **Percentile** for these two: round(100 × number of players in the group with a lower value / (players in the group − 1)). A missing value counts as 0.
+- **Age** (weight 10): a fixed scale, not a percentile: 50 through age 33 (or if age is unknown), 40 at 34, then 40 − 5 × (age − 34), down to 0.
+- **Reliability** = round((45 × recency + 25 × projected playing time + 10 × age) / 80). Age tops out at 50, so the highest possible score is 94.
+- `weights.json` also lists `consistency` at weight 0; it isn't computed.
 
 ## Sources
 

@@ -1,0 +1,9 @@
+# Downloaded and generated data stays local; rebuild it with data-pipeline/01_pull.R.
+# Only the top-level data/ folder: draft-tool/data/ holds the published site files.
+/data/
+
+# R session files
+.Rhistory
+.RData
+.Rproj.user/
+.Ruserdata

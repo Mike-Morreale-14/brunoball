@@ -1,4 +1,4 @@
-/* Draft Scout 2026, public edition. Dark theme by default; [data-theme="light"] overrides below. */
+/* Draft Scout 2026. Dark theme by default; [data-theme="light"] overrides below. */
 
 :root {
   --bg-body: #0f1320;
@@ -150,7 +150,7 @@ a { color: var(--accent-spd); }
 .filter-head.hit { color: var(--accent-spd); background: var(--bg-arch-hitter); }
 .filter-head.pit { color: var(--accent-pwr); background: var(--bg-arch-pitcher); }
 .filter-row { display: flex; align-items: center; gap: 3px; padding: 1px 0; }
-.filter-row .fl { width: 26px; font-size: 11px; font-weight: 700; color: var(--text-dim); font-family: var(--mono); text-align: right; }
+.filter-row .fl { width: 72px; font-size: 11px; font-weight: 700; color: var(--text-dim); font-family: var(--mono); text-align: right; }
 .filter-row.active .fl { color: var(--c); }
 .filter-row .fv { font-size: 9px; color: var(--text-dim); width: 18px; font-family: var(--mono); }
 .filter-row .fv.lo { text-align: right; }
@@ -315,23 +315,18 @@ a { color: var(--accent-spd); }
 
 /* Bars */
 .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-.bar-row.layered { margin-bottom: 3px; }
-.bar-label { font-size: 12px; color: var(--text-muted); width: 54px; text-align: right; font-family: var(--mono); flex-shrink: 0; }
-.bar-stack { flex: 1; display: flex; flex-direction: column; gap: 1px; }
+.bar-label { font-size: 12px; color: var(--text-muted); width: 76px; text-align: right; font-family: var(--mono); flex-shrink: 0; }
+.bar-stack { flex: 1; }
 .pbar { height: 9px; border-radius: 5px; background: var(--bg-track); }
-.pbar.sub { height: 4px; border-radius: 3px; }
 .pbar-fill { height: 100%; border-radius: inherit; transition: width .3s; }
-.bar-value { font-size: 14px; color: var(--text-value); font-family: var(--mono); font-weight: 600; min-width: 34px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
-.bar-delta { font-size: 11px; font-weight: 700; font-family: var(--mono); }
+.bar-value { font-size: 14px; color: var(--text-value); font-family: var(--mono); font-weight: 600; min-width: 34px; }
 .flag { font-size: 9px; font-weight: 700; font-family: var(--mono); color: var(--tier-yel); border: 1px solid var(--tier-yel); border-radius: 3px; padding: 0 4px; white-space: nowrap; }
 
-.legend-toggle { font-size: 10px; color: var(--text-muted); cursor: pointer; margin: 2px 0 4px; font-family: var(--mono); user-select: none; background: none; border: none; }
-.legend-toggle:hover { color: var(--text-value); }
-.legend { font-size: 11px; color: var(--text-muted); padding: 6px 8px; margin-bottom: 6px; background: var(--bg-surface); border: 1px solid var(--border-chrome); border-radius: 6px; line-height: 1.5; }
-.legend p { margin-bottom: 3px; }
-.swatch { display: inline-block; width: 20px; height: 4px; border-radius: 3px; background: var(--text-muted); vertical-align: middle; margin-right: 4px; }
+/* 2025 Results vs Skills */
+.sec-note { font-size: 11px; color: var(--text-muted); line-height: 1.45; margin: 2px 0 4px; }
+.dt .gap { font-weight: 700; }
+.gap-table .flag { margin-left: 4px; }
 
-.rel-note { font-size: 11px; color: var(--text-muted); margin: 2px 0 4px; }
 
 .toggle-btn { background: var(--bg-surface); border: 1px solid var(--border-chrome); color: var(--text-value); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 11px; font-family: var(--mono); margin-top: 8px; width: 100%; text-align: left; }
 .hist-wrap { margin-top: 6px; max-height: 256px; overflow: auto; border: 1px solid var(--border-chrome); border-radius: 5px; }
@@ -359,6 +354,11 @@ a { color: var(--accent-spd); }
 .wt-table td.wt-name { text-align: left; width: 46%; }
 .wt-table .wt-def { font-size: 10px; color: var(--text-muted); line-height: 1.35; }
 .wt-table th:nth-child(2) { width: 26%; }
+.wt-table.score-only th:nth-child(2) { width: 54%; }
+.wt-table.rel-table td.wt-name { width: 34%; }
+.wt-table.rel-table th:nth-child(2) { width: 14%; }
+.wt-table.rel-table th:last-child, .wt-table td.wt-what { text-align: left; }
+.wt-table td.wt-what { font-size: 11px; color: var(--text-secondary); }
 .wt-main { display: flex; align-items: center; gap: 6px; }
 .wt-main input[type=range] { flex: 1; min-width: 60px; accent-color: var(--accent-pwr); }
 .wt-table .wv { display: inline-block; min-width: 22px; font-size: 11px; font-weight: 700; color: var(--accent-pwr); text-align: right; }
