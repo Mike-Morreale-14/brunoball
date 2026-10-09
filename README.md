@@ -8,7 +8,7 @@ and an [end-of-season recap](https://mike-morreale-14.github.io/brunoball/wrappe
 
 ## Draft Scout
 
-[<img src="draft-tool/screenshot.png" width="700" alt="Draft Scout">](https://mike-morreale-14.github.io/brunoball/draft-tool/)
+[<img src="draft-tool/banner.png" width="700" alt="Draft Scout with Shohei Ohtani's player page open">](https://mike-morreale-14.github.io/brunoball/draft-tool/)
 
 A draft tool that lists the top 300 players by FantasyPros ADP.
 Hitters are scored on Power, Speed and AVG, and starting
@@ -22,7 +22,7 @@ skills, and you can adjust the weights as you draft.
 
 ## Weekly Power Rankings
 
-[<img src="power-rankings/weekly-table.png" width="49%" align="top" alt="Weekly Rank table for week 16, with Team Bruno highlighted">](https://mike-morreale-14.github.io/brunoball/power-rankings/) [<img src="power-rankings/rank-by-week.png" width="49%" align="top" alt="Weekly Rank by week, with Team Bruno highlighted">](https://mike-morreale-14.github.io/brunoball/power-rankings/)
+[<img src="power-rankings/banner.png" width="700" alt="Weekly Rank table for week 16 and the rank-by-week chart, with Team Bruno highlighted">](https://mike-morreale-14.github.io/brunoball/power-rankings/)
 
 I posted power rankings to the league group chat every week. The rankings
 use roto scoring, a standard technique to eliminate schedule luck.
@@ -34,8 +34,7 @@ recent weeks counting most.
 
 ## Season Wrapped
 
-[<img src="wrapped/crops/06.jpg" width="49%" align="top" alt="Category Kings slide: the leader and last place in each category">](https://mike-morreale-14.github.io/brunoball/wrapped/) [<img src="wrapped/crops/07.jpg" width="49%" align="top" alt="Expected Record slide: one team's week replayed against all nine other teams">](https://mike-morreale-14.github.io/brunoball/wrapped/)
-[<img src="wrapped/crops/11.jpg" width="49%" align="top" alt="The Dream Week slide: the best single-week mark in each category">](https://mike-morreale-14.github.io/brunoball/wrapped/) [<img src="wrapped/crops/14.jpg" width="49%" align="top" alt="Team slide for I think Yammamoto likes you, the first-place team">](https://mike-morreale-14.github.io/brunoball/wrapped/)
+[<img src="wrapped/banner.jpg" width="700" alt="Four recap slides: Category Kings, Expected Record, The Dream Week, and the team slide for I think Yammamoto likes you">](https://mike-morreale-14.github.io/brunoball/wrapped/)
 
 A slideshow recap of the regular season for the league, inspired by Spotify
 Wrapped, with the best and worst weeks, schedule luck and a slide for each team.
