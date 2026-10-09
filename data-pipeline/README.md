@@ -4,12 +4,10 @@ The scripts in this folder download public baseball data and turn it into the ta
 
 | Script | What it does |
 |---|---|
-| `01_pull.R` | Downloads raw data, one CSV per source and season, into `data/raw/`. It never edits what it downloads |
-| `02_clean.R` | Reads `data/raw/` and writes clean player, hitter, pitcher and league tables to `data/clean/`. It never edits `data/raw/` |
-| `03_marcel.R` | Reads `data/clean/` and writes Marcel projections, plus a quality-starts extension, to `data/projections/` |
-| `04_scores.R` | Matches the FantasyPros ADP list to player IDs and writes the draft site's data to `draft-tool/data/` (committed, unlike `data/`) |
-
-The raw data in this project was pulled in October 2026.
+| `01_pull.R` | Downloads raw data, one CSV per source and season. |
+| `02_clean.R` | Writes clean player, hitter, pitcher and league tables.  |
+| `03_marcel.R` | Writes Marcel projections plus a quality-starts extension. |
+| `04_scores.R` | Matches the FantasyPros ADP list to player IDs |
 
 ## What `01_pull.R` downloads
 
@@ -27,7 +25,7 @@ The seasons are 2023–2025 by default, set at the top of the script.
 | `savant_pitcher_measures_<season>.csv` | Baseball Savant custom leaderboard: innings, xERA, fastball velocity, whiff rate, K%, BB%, and allowed: hard-hit rate, barrel rate, ground-ball rate, zone contact, fly balls, home runs | Pitcher |
 | `mlb_people_<season>.csv` | MLB Stats API player bios (birth date, bats, throws, position) for every player in that season's files | Player |
 | `chadwick_register.csv` | Chadwick Bureau register: players with an MLB ID who last played in 2023 or later | Player |
-| `fantasypros_adp_2026.csv` | FantasyPros 2026 ADP, copied by hand in March 2026 (not downloaded by `01_pull.R`) | Player |
+| `fantasypros_adp_2026.csv` | FantasyPros 2026 ADP, copied by hand in March 2026 | Player |
 
 Hitters and pitchers are kept in separate files. A two-way player such as Shohei Ohtani appears in both, under the same player ID.
 
@@ -40,12 +38,10 @@ Hitters and pitchers are kept in separate files. A two-way player such as Shohei
 2. From the brunoball project folder, run:
    ```
    Rscript data-pipeline/01_pull.R          # all seasons set at the top of the script
-   Rscript data-pipeline/01_pull.R 2025     # only the seasons you list
    Rscript data-pipeline/02_clean.R         # then build the clean tables
    Rscript data-pipeline/03_marcel.R        # then the Marcel projections
    Rscript data-pipeline/04_scores.R        # then the draft-site inputs
    ```
-   You can also open `brunoball.Rproj` in RStudio and run the script from there.
 
 **How it behaves**
 - **Already-saved files are skipped.** A file is written under a temporary name and renamed only when the save has finished, so a file that exists is complete. To download a file again, delete it.
@@ -53,8 +49,6 @@ Hitters and pitchers are kept in separate files. A two-way player such as Shohei
 - **Pauses between requests are set at the top:** 0.5 s for the MLB Stats API and 5 s for Baseball Savant.
 - **The game logs take the longest:** one request per starting pitcher, about 4–6 minutes per season.
 - At the end it prints every file in `data/raw/` with its row count.
-
-`data/` is listed in `.gitignore`, so downloaded data is never committed. Anyone can rebuild it with this script.
 
 ## What `02_clean.R` writes
 
@@ -89,7 +83,7 @@ Before writing anything, the script checks that each table has one row per playe
 
 ## What `03_marcel.R` projects
 
-`03_marcel.R` reads `data/clean/` and writes `data/projections/marcel_hitters_<season>.csv` and `marcel_pitchers_<season>.csv`. It follows Tom Tango's Marcel method: a deliberately simple projection that uses only the last three seasons, weights recent seasons more, pulls everyone toward the league average, and adjusts for age. The season to project is set at the top (`TARGET_SEASON`, 2026), and it always uses the three seasons before it.
+`03_marcel.R` writes `data/projections/marcel_hitters_<season>.csv` and `marcel_pitchers_<season>.csv`. It follows Tom Tango's Marcel method: a deliberately simple projection that uses only the last three seasons, weights recent seasons more, pulls everyone toward the league average, and adjusts for age. The season to project is set at the top (`TARGET_SEASON`, 2026), and it always uses the three seasons before it.
 
 | Step | Hitters | Pitchers |
 |---|---|---|
@@ -106,13 +100,13 @@ From these it derives AB, H, AVG, OBP, SLG, OPS, ISO, K% and BB% for hitters, an
 - **Quality starts are an extension, not part of Marcel.** QS per start uses the same 3/2/1 weights and is pulled toward the league QS rate with 50 weighted starts, then multiplied by projected starts. QS are not rebaselined. Wins and saves are not projected.
 - **The age adjustment follows Tango as published:** one multiplier on every rate except playing time, so a young player's strikeouts (and a young pitcher's hits allowed) go up along with everything else.
 - **Judgement calls**, each marked in the script: how part-time starters' playing time and projected starts are set. The 268 IP pitcher regression isn't stated on Tango's pages; it was fitted to the reliability column of his 2012 Marcel file using real 2009–11 innings for six pitchers (best fit 268.0).
-- **Projecting a past season** to grade it needs the three seasons before it in `data/clean/`. For 2025 that means pulling 2022 first.
+- **Projecting a past season** to grade it needs the three seasons before it. For 2025 that means pulling 2022 first.
 
 The script prints the projected league rates next to the last season's, the top 15 in HR, SB, pitcher strikeouts and ERA (120+ IP), and the rows for Aaron Judge, Tarik Skubal and Shohei Ohtani. It stops without writing if a player appears twice or the league rates don't match.
 
 ## What `04_scores.R` writes
 
-`04_scores.R` builds the inputs for the draft site in [`draft-tool/data/`](../draft-tool/data/): `hitters.json`, `sp.json` and `relievers.json`, plus a copy of `weights.json`. That folder is committed with the site, unlike `data/`. Each file also carries the display stats the site shows: 2025 and 2023–25 numbers, the Marcel projection, key Savant measures and year-by-year history.
+`04_scores.R` builds the inputs for the draft site in [`draft-tool/data/`](../draft-tool/data/): `hitters.json`, `sp.json` and `relievers.json`, plus a copy of `weights.json`. Each file also carries the display stats the site shows: 2025 and 2023–25 numbers, the Marcel projection, key Savant measures and year-by-year history.
 
 **The pool** is every player with a FantasyPros ADP of 300 or better.
 - **Matching to MLB IDs:** names are matched after removing accents, punctuation and Jr./II-style suffixes, and only against projected players of the same kind (hitter or pitcher). That settles namesakes such as Will Smith.
@@ -127,75 +121,7 @@ The script prints the projected league rates next to the last season's, the top 
 - Relievers, closers included, are shown with their stats and no score. Marcel doesn't project saves.
 
 **Scores**
-- Each score is the weighted mean of the percentiles a player has; missing inputs are skipped, not counted as zero.
-- Every weight lives in [`weights.json`](weights.json), which this script and the site both read.
-- Main, Raw and Underlying are three separate weight sets, and the delta is Underlying minus Raw. Raw leans on 2025 results, Underlying on 2025 Savant skill measures, and Main mixes in the Marcel projection.
-- **Raw uses 2025 rates, never counting stats.** In this version Raw was changed from counts to rates (HR and SB per PA, QS per start; innings and strikeout totals dropped) so the delta isn't driven by playing time. Playing time still counts in Main, through Marcel's projected PA and IP.
-- **Speed has no delta on the site**, though its three scores stay. Underlying Speed includes contact rate, so its gap with Raw isn't a luck signal. `weights.json` lists it under `hide_delta`.
-- **Small samples are flagged.** A player with fewer than 200 PA or 50 IP in 2025 has `small_2025_sample: true`, and the site should mark that player's deltas "small 2025 sample".
-- Volatility has only a Main score, and a higher Volatility means riskier.
-- `reliability` is the 2026 tool's reliability score, rebuilt on 2023–25 data. It's a 0–100 weighted mean of three inputs, with weights in `weights.json`:
-  - **recency** (45): games (hitters) or innings (starters) per season in 2023–25, averaged with weights e^(0.3 × i) from the oldest season (i = 0) to the newest, as a percentile within the group;
-  - **projected playing time** (25): Marcel PA or IP, as a percentile within the group;
-  - **age** (10): 50 through age 33, 40 at 34, then 5 less per year.
-
-  These percentiles are the share of the group strictly below the player, as in the 2026 tool. Consistency has weight 0 and isn't computed. The 2026 tool's history went back to 2015; this version covers three seasons.
-- The site files carry the percentiles, not the scores. The script computes the scores only to check them.
-
-**The weights are my own judgement, not fitted to data.**
-
-| Score | Old input | New input (`weights.json` key) | Source | Weight (Main / Raw / Und) |
-|---|---|---|---|---|
-| Power | barrel | `barrel` | 2025 Savant barrel % | 25 / 20 / 40 |
-| Power | ev | `ev` | 2025 Savant average exit velocity | 20 / 15 / 30 |
-| Power | iso | `proj_iso` / `act_iso` / `xiso` | Main: Marcel ISO; Raw: 2025 MLB ISO; Und: 2025 Savant xSLG − xBA | 20 / 25 / 20 |
-| Power | fb | `fb` | 2025 Savant fly-ball % | 10 / 5 / 10 |
-| Power | proj_hr | `proj_hr` | Marcel HR | 15 / – / – |
-| Power | act_hr | `act_hr` / `act_hr_pa` | Main: 2025 MLB HR; Raw: 2025 HR per PA | 10 / 35 / – |
-| Speed | spd | `sprint` | 2025 Savant sprint speed | 40 / 50 / 70 |
-| Speed | proj_sb | `proj_sb` | Marcel SB | 35 / – / – |
-| Speed | act_sb | `act_sb` / `act_sb_pa` | Main: 2025 MLB SB; Raw: 2025 SB per PA | 25 / 50 / – |
-| Speed, AVG | contact | `contact` | 100 − 2025 Savant whiff % | – / – / 30 (Speed), 15 (AVG) |
-| AVG | xavg | `xavg` | 2025 Savant xBA | 20 / – / 35 |
-| AVG | proj_avg | `proj_avg` | Marcel AVG | 20 / – / – |
-| AVG | low_k | `proj_low_k` / `act_low_k` | Main: Marcel K%; Raw and Und: 2025 MLB K% | 15 / 30 / 30 |
-| AVG | ocontact | `ocontact` | 2025 Savant chase contact % | 15 / 20 / 20 |
-| AVG | babip | `proj_babip` / `act_babip` | Main: Marcel BABIP; Raw: 2025 MLB BABIP | 15 / 20 / – |
-| AVG | act_avg | `act_avg` | 2025 MLB AVG | 15 / 30 / – |
-| Anchor | proj_ip | `proj_ip` | Marcel IP | 20 / – / – |
-| Anchor | proj_qs | `proj_qs` | Marcel QS (the quality-starts extension) | 20 / – / – |
-| Anchor | low_era | `proj_low_era` | Marcel ERA | 20 / – / – |
-| Anchor | low_whip | `proj_low_whip` | Marcel WHIP | 15 / – / – |
-| Anchor | low_siera | `low_xera` | 2025 Savant xERA (replaces FanGraphs SIERA) | 15 / – / 40 |
-| Anchor | low_hard | `low_hard` | 2025 Savant hard-hit % allowed | 10 / – / 30 |
-| Anchor | gb | `gb` | 2025 Savant ground-ball % allowed | – / – / 30 |
-| Anchor | act_qs, act_low_era, act_low_whip | `act_qs_gs`, `act_low_era`, `act_low_whip` | 2025 QS per start (from game logs), ERA, WHIP | – / 25, 25, 20 / – |
-| Anchor | act_ip | – | Dropped from Raw: innings are playing time, which Main covers | – |
-| K Arm | fbv | `fbv` | 2025 Savant fastball velocity | 25 / 25 / 35 |
-| K Arm | kpct | `act_kpct` | 2025 MLB K% | 20 / 20 / 25 |
-| K Arm | proj_k, proj_k9 | `proj_k`, `proj_k9` | Marcel SO, and 9 × SO / IP | 15, 15 / – / – |
-| K Arm | swstr | `whiff` | 2025 Savant whiff % (per swing; FanGraphs SwStr% was per pitch) | 15 / – / 25 |
-| K Arm | low_zcon | `low_zcon` | 2025 Savant zone contact % allowed | 10 / – / 15 |
-| K Arm | act_k9 | `act_k9` | 2025 MLB K/9 | – / 25 / – |
-| K Arm | act_k | – | Dropped from Raw: a strikeout total measures playing time; K% and K/9 cover the skill | – |
-| Volatility | hrfb | `hrfb` | 2025 Savant HR per fly ball allowed | 35 |
-| Volatility | hard | `hard` | 2025 Savant hard-hit % allowed | 25 |
-| Volatility | barrel_ag | `barrel_ag` | 2025 Savant barrel % allowed | 25 |
-| Volatility | spread | – | Dropped: it measured disagreement between three paid projection systems | – |
-| Closer | cl_score (SV, IP, ERA, WHIP) | – | Dropped as a score: relievers are shown with stats only | – |
-| Reliability | recency | `recency` | 2023–25 MLB games (hitters) or innings (SP), recency-weighted average | 45 |
-| Reliability | proj | `proj` | Marcel PA or IP | 25 |
-| Reliability | age_rel | `age_rel` | Age from the player bio | 10 |
-| Reliability | consistency | `consistency` | Not computed | 0 |
-| Not shown | overall, fantasy points, VORP, spreads | – | Dropped: built on paid projections and never displayed | – |
-
-Before writing anything, the script checks the following, and stops if any check fails:
-- every pool row is matched or listed as unscored with a reason;
-- no player appears twice in a group;
-- every percentile runs 0–100 within its group;
-- for five players, the R scores equal a separate recomputation that loops over the written file and `weights.json` the way the site does.
-
-It also prints the top 10 by Main for each archetype and the 10 biggest positive and negative deltas (Power, AVG, Anchor and K Arm), each with its small-sample flag.
+tbd
 
 ## Sources
 
