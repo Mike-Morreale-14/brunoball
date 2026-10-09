@@ -8,7 +8,7 @@ A 10-team Yahoo league with friends, 2026 season.
 | Draft | Live snake draft, 90 seconds per pick |
 | Regular season | Weeks 1–22 |
 | Playoffs | 6 teams, weeks 23–25 |
-| Trade deadline | August 6 |
+| Trade deadline | Week 18 |
 | Waivers | FAAB, 2-day waiver period, 6 adds per week |
 | Pitching minimum | 20 innings per week |
 
