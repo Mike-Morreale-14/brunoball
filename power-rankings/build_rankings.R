@@ -9,11 +9,6 @@ N_TEAMS <- 10
 CATS <- c("R", "HR", "RBI", "SB", "AVG", "OPS", "W", "SV", "K", "ERA", "WHIP", "QS")
 LOWER_BETTER <- c("ERA", "WHIP") # every other category ranks highest first
 DECAY <- 0.8 # a week counts DECAY times as much as the week after it in the power rankings
-# Same colours as the page, in week-1 team order.
-TEAM_COLORS <- c(
-  "#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f",
-  "#d4a017", "#b07aa1", "#ff7f9f", "#9c755f", "#7f8c9b"
-)
 DOMINANT_WINS <- 70 # all-play category wins (of 108) that make a "70+ week"
 CHECK_WEEK <- 18 # week the reference numbers below come from
 
@@ -26,7 +21,6 @@ suppressPackageStartupMessages({
   library(readr)
   library(tidyr)
   library(jsonlite)
-  library(ggplot2)
   library(here)
 })
 
@@ -227,26 +221,3 @@ if (!all(passed)) stop("Some checks failed; nothing was written.", call. = FALSE
 path <- here("power-rankings", "data", "rankings.json")
 write_json(out, path, auto_unbox = TRUE, digits = NA)
 message("Wrote power-rankings/data/rankings.json (", N_WEEKS, " weeks)")
-
-
-# ---- Chart for the READMEs ---------------------------------------------------
-
-ranks <- imap(out$by_week, \(b, n) tibble(week = n, team = teams, rank = map_int(b$power, "rank"))) |>
-  bind_rows() |>
-  mutate(team = factor(team, levels = teams))
-# Names sit at each line's end instead of a legend; final ranks are all different, so they never overlap.
-ends <- filter(ranks, week == N_WEEKS)
-
-p <- ggplot(ranks, aes(week, rank, colour = team)) +
-  geom_line(linewidth = 1) +
-  geom_point(data = ends, size = 2) +
-  geom_text(data = ends, aes(label = team), hjust = 0, nudge_x = 0.4, size = 3.4) +
-  scale_y_reverse(breaks = 1:N_TEAMS, minor_breaks = NULL) +
-  scale_x_continuous(breaks = seq_len(N_WEEKS), minor_breaks = NULL, expand = expansion(add = c(0.5, 7))) +
-  scale_colour_manual(values = TEAM_COLORS, guide = "none") +
-  coord_cartesian(clip = "off") +
-  labs(title = "Power rank by week, 2026", x = "Week", y = "Power rank") +
-  theme_minimal(base_size = 12) +
-  theme(plot.background = element_rect(fill = "white", colour = NA), panel.grid.major.x = element_blank())
-ggsave(here("power-rankings", "rank-by-week.png"), p, width = 10, height = 5.5, dpi = 150)
-message("Wrote power-rankings/rank-by-week.png")

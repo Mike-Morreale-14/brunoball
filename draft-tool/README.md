@@ -4,7 +4,7 @@ Draft Scout is a fantasy baseball draft tool built on free public data and proje
 
 **[Try it](https://mike-morreale-14.github.io/brunoball/draft-tool/)**
 
-[![Draft Scout with Shohei Ohtani's player page open](screenshot.png)](https://mike-morreale-14.github.io/brunoball/draft-tool/)
+[<img src="screenshot.png" width="700" alt="Draft Scout with Shohei Ohtani's player page open">](https://mike-morreale-14.github.io/brunoball/draft-tool/)
 
 ## How to use it
 

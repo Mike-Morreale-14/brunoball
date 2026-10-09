@@ -8,7 +8,7 @@ and an end-of-season recap to commemorate the year.
 
 ## Draft Scout
 
-[![Draft Scout](draft-tool/screenshot.png)](https://mike-morreale-14.github.io/brunoball/draft-tool/)
+[<img src="draft-tool/screenshot.png" width="700" alt="Draft Scout">](https://mike-morreale-14.github.io/brunoball/draft-tool/)
 
 A draft tool that lists the top 300 players by FantasyPros ADP.
 Hitters are scored on Power, Speed and AVG, and starting
@@ -22,7 +22,7 @@ skills, and you can adjust the weights as you draft.
 
 ## Weekly Power Rankings
 
-[![Power rank by week](power-rankings/rank-by-week.png)](https://mike-morreale-14.github.io/brunoball/power-rankings/)
+[<img src="power-rankings/rank-by-week.png" width="700" alt="Power rank by week, with Team Bruno highlighted">](https://mike-morreale-14.github.io/brunoball/power-rankings/)
 
 Weekly roto and all-play results for my league, with power rankings that
 weight recent weeks more, so you can see who was strong and who was lucky.
