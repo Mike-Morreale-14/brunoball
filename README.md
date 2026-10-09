@@ -3,7 +3,7 @@
 I play in a 10-team, head-to-head categories fantasy baseball league
 with friends ([league rules](LEAGUE_RULES.md)). Over the 2026 season
 I built a few tools for it: a [draft tool](https://mike-morreale-14.github.io/brunoball/draft-tool/) the whole league could use 
-before and during the draft, weekly power rankings for the group chat, 
+before and during the draft, [weekly power rankings](https://mike-morreale-14.github.io/brunoball/power-rankings/) for the group chat, 
 and an end-of-season recap to commemorate the year.
 
 ## Draft Scout
@@ -22,10 +22,12 @@ skills, and you can adjust the weights as you draft.
 
 ## Weekly Power Rankings
 
-[<img src="power-rankings/rank-by-week.png" width="700" alt="Power rank by week, with Team Bruno highlighted">](https://mike-morreale-14.github.io/brunoball/power-rankings/)
+[<img src="power-rankings/rank-by-week.png" width="700" alt="Weekly Rank by week, with Team Bruno highlighted">](https://mike-morreale-14.github.io/brunoball/power-rankings/)
 
-Weekly roto and all-play results for my league, with power rankings that
-weight recent weeks more, so you can see who was strong and who was lucky.
+I posted power rankings to the league group chat every week. Teams are
+ranked on roto points, so the order doesn't depend on who played whom.
+Weekly Rank shows one week, and Season Rank blends every week, with
+recent weeks counting most.
 
 **[View the rankings](https://mike-morreale-14.github.io/brunoball/power-rankings/)**
 · [How it works](power-rankings/)

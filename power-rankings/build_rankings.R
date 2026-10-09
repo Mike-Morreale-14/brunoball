@@ -1,4 +1,4 @@
-# build_rankings.R: weekly roto results and seasonally weighted power rankings for the league.
+# build_rankings.R: Weekly Rank and Season Rank for the league, plus the weighting heatmap for the README.
 # Run from the project folder: Rscript power-rankings/build_rankings.R
 
 
@@ -8,8 +8,8 @@ N_WEEKS <- 22 # regular-season weeks in the data
 N_TEAMS <- 10
 CATS <- c("R", "HR", "RBI", "SB", "AVG", "OPS", "W", "SV", "K", "ERA", "WHIP", "QS")
 LOWER_BETTER <- c("ERA", "WHIP") # every other category ranks highest first
-DECAY <- 0.8 # a week counts DECAY times as much as the week after it in the power rankings
-DOMINANT_WINS <- 70 # all-play category wins (of 108) that make a "70+ week"
+DECAY <- 0.8 # a week counts DECAY times as much as the week after it in the Season Rank
+DOMINANT_WINS <- 70 # category wins vs. the league (of 108) that make a "70+ week"
 CHECK_WEEK <- 18 # week the reference numbers below come from
 
 
@@ -21,6 +21,7 @@ suppressPackageStartupMessages({
   library(readr)
   library(tidyr)
   library(jsonlite)
+  library(ggplot2)
   library(here)
 })
 
@@ -60,9 +61,15 @@ h2h <- function(wk, a, b) {
   c(w = sum(better & !tied), l = sum(!better & !tied), t = sum(tied))
 }
 
-# Actual win share minus all-play win share, ties counted as half a win.
+# Actual win share minus win share vs. the league, ties counted as half a win.
 luck <- function(act, exp) {
   (act[["w"]] + 0.5 * act[["t"]]) / sum(act) - (exp[["w"]] + 0.5 * exp[["t"]]) / sum(exp)
+}
+
+# Season Rank weights as of week n, for weeks 1 to n: week n gets 1, week n-1 gets DECAY, and so on; scaled to sum to 1.
+season_weights <- function(n) {
+  w <- DECAY^(n - seq_len(n))
+  w / sum(w)
 }
 
 # Ranks teams by a total, best first; exact ties keep week-1 order.
@@ -74,27 +81,25 @@ rank_by <- function(total) order(order(-total))
 weeks <- map(seq_len(N_WEEKS), \(w) {
   wk <- filter(stats, week == w)
   pts <- sapply(CATS, \(cat) roto_points(wk[[cat]], cat))
-  # All-play: every team's categories against all nine others that week.
-  allplay <- t(sapply(seq_len(N_TEAMS), \(i) {
+  # Record vs. league: every team's categories against all nine others that week.
+  vs_league <- t(sapply(seq_len(N_TEAMS), \(i) {
     rowSums(sapply(setdiff(seq_len(N_TEAMS), i), \(j) h2h(wk, i, j)))
   }))
   actual <- t(sapply(seq_len(N_TEAMS), \(i) h2h(wk, i, wk$opp_i[i])))
-  list(wk = wk, pts = pts, roto = round1(rowSums(pts)), allplay = allplay, actual = actual)
+  list(wk = wk, pts = pts, roto = round1(rowSums(pts)), vs_league = vs_league, actual = actual)
 })
 
 
-# ---- Power rankings as of each week ------------------------------------------
+# ---- Season Rank as of each week ---------------------------------------------
 
 power <- map(seq_len(N_WEEKS), \(n) {
-  # Week n gets weight 1, week n-1 gets DECAY, and so on; scaled to sum to 1.
-  w <- DECAY^(n - seq_len(n))
-  w <- w / sum(w)
+  w <- season_weights(n)
   cat_pts <- Reduce(`+`, map2(weeks[seq_len(n)], w, \(x, wt) x$pts * wt))
-  # Records are season totals, not decayed; "Avg" sums each week's all-play record divided by 9.
-  allplay <- Reduce(`+`, map(weeks[seq_len(n)], "allplay"))
+  # Records are season totals, not decayed; "Avg" sums each week's record vs. league divided by 9.
+  vs_league <- Reduce(`+`, map(weeks[seq_len(n)], "vs_league"))
   actual <- Reduce(`+`, map(weeks[seq_len(n)], "actual"))
-  dominant <- Reduce(`+`, map(weeks[seq_len(n)], \(x) as.integer(x$allplay[, "w"] >= DOMINANT_WINS)))
-  list(cat_pts = cat_pts, roto = round1(rowSums(cat_pts)), avg = allplay / 9, actual = actual, dominant = dominant)
+  dominant <- Reduce(`+`, map(weeks[seq_len(n)], \(x) as.integer(x$vs_league[, "w"] >= DOMINANT_WINS)))
+  list(cat_pts = cat_pts, roto = round1(rowSums(cat_pts)), avg = vs_league / 9, actual = actual, dominant = dominant)
 })
 
 
@@ -108,8 +113,8 @@ week_table <- function(n) {
     list(
       team = i - 1, rank = rank_by(x$roto)[i], roto = x$roto[i],
       stats = as.list(unlist(x$wk[i, CATS])), pts = as.list(x$pts[i, ]),
-      total = record(x$allplay, i), avg = record(x$allplay / 9, i, 4), actual = record(x$actual, i),
-      luck = round(luck(x$actual[i, ], x$allplay[i, ]), 4)
+      total = record(x$vs_league, i), avg = record(x$vs_league / 9, i, 4), actual = record(x$actual, i),
+      luck = round(luck(x$actual[i, ], x$vs_league[i, ]), 4)
     )
   })
 }
@@ -189,11 +194,11 @@ passed <- c(
     close(wk_luck, reference$week_luck)
   ),
   check(
-    paste0(sprintf("power totals through week %d match within 0.1", CHECK_WEEK), gap(pw_roto, reference$power_roto)),
+    paste0(sprintf("Season Rank totals through week %d match within 0.1", CHECK_WEEK), gap(pw_roto, reference$power_roto)),
     close(pw_roto, reference$power_roto)
   ),
   check(
-    paste0(sprintf("power luck through week %d matches within 0.1", CHECK_WEEK), gap(pw_luck, reference$power_luck)),
+    paste0(sprintf("Season Rank luck through week %d matches within 0.1", CHECK_WEEK), gap(pw_luck, reference$power_luck)),
     close(pw_luck, reference$power_luck)
   )
 )
@@ -205,7 +210,7 @@ print(
     team = teams,
     record = map_chr(final, \(r) paste(r$actual, collapse = "-")),
     win_share = map_dbl(final, \(r) (r$actual[1] + 0.5 * r$actual[3]) / sum(r$actual)),
-    power_rank = map_int(final, "rank")
+    season_rank = map_int(final, "rank")
   ) |>
     arrange(desc(win_share)) |>
     mutate(win_share = round(win_share, 3)) |>
@@ -221,3 +226,36 @@ if (!all(passed)) stop("Some checks failed; nothing was written.", call. = FALSE
 path <- here("power-rankings", "data", "rankings.json")
 write_json(out, path, auto_unbox = TRUE, digits = NA)
 message("Wrote power-rankings/data/rankings.json (", N_WEEKS, " weeks)")
+
+
+# ---- Weighting heatmap for the README ----------------------------------------
+
+# One row per Season Rank (as of week n), one column per week played; each cell is that week's share of the weight.
+weights <- map(seq_len(N_WEEKS), \(n) tibble(as_of = n, played = seq_len(n), share = season_weights(n))) |>
+  bind_rows() |>
+  mutate(label = if_else(share >= 0.01, sprintf("%.0f%%", 100 * share), ""))
+
+heatmap <- ggplot(weights, aes(played, as_of, fill = share)) +
+  geom_tile(colour = "white", linewidth = 0.4) +
+  geom_text(aes(label = label, colour = share > 0.3), size = 2.2, show.legend = FALSE) +
+  scale_fill_gradient(
+    low = "#e3eefa", high = "#0b3d75", trans = "sqrt", limits = c(0, 1),
+    breaks = c(0.01, 0.1, 0.25, 0.5, 1), labels = c("1%", "10%", "25%", "50%", "100%"), name = "Share of\nthe weight"
+  ) +
+  scale_colour_manual(values = c(`FALSE` = "#1a1a1a", `TRUE` = "white")) +
+  scale_x_continuous(breaks = seq_len(N_WEEKS), expand = c(0, 0), position = "top") +
+  scale_y_reverse(breaks = seq_len(N_WEEKS), expand = c(0, 0)) +
+  labs(
+    title = "How each week counts in the Season Rank",
+    subtitle = sprintf("Each week counts %.1f times as much as the week after it. Blank cells are under 1%%.", DECAY),
+    x = "Week played", y = "Season Rank as of week"
+  ) +
+  coord_equal() +
+  theme_minimal(base_size = 9) +
+  theme(
+    plot.background = element_rect(fill = "white", colour = NA), panel.grid = element_blank(),
+    plot.title = element_text(face = "bold", size = 11), plot.title.position = "plot",
+    legend.title = element_text(size = 8)
+  )
+ggsave(here("power-rankings", "weighting-heatmap.png"), heatmap, width = 7, height = 6.6, dpi = 200)
+message("Wrote power-rankings/weighting-heatmap.png")

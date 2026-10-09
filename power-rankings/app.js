@@ -6,6 +6,7 @@ const TEAM_COLORS = ['#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f', '#d4
 let data = null;
 let week = 22;
 let highlighted = null;
+let chartMode = 'results'; // 'results' = Weekly Rank, 'power' = Season Rank
 
 const $ = (id) => document.getElementById(id);
 const isLight = () => document.documentElement.dataset.theme === 'light';
@@ -48,7 +49,7 @@ function table(rows, kind) {
   const sorted = [...rows].sort((a, b) => a.rank - b.rank);
   const totalT = scaler(rows.map((r) => r.roto));
   const catT = Object.fromEntries(data.cats.map((c) => [c, scaler(rows.map((r) => r.pts[c]))]));
-  const extra = kind === 'results' ? ['Total', 'Avg', 'Actual', 'Luck'] : ['70+ Wk', 'Avg', 'Actual', 'Luck'];
+  const extra = kind === 'results' ? ['Record vs. league', 'Avg', 'Actual', 'Luck'] : ['70+ Wk', 'Avg', 'Actual', 'Luck'];
   const body = sorted.map((r) => {
     const t = totalT(r.roto);
     const cats = data.cats.map((c, k) => {
@@ -66,7 +67,7 @@ function table(rows, kind) {
   return head(extra) + `<tbody>${body}</tbody>`;
 }
 
-// ---- Chart: each team's power rank by week ----
+// ---- Chart: each team's Weekly Rank or Season Rank by week ----
 function chart() {
   const svg = $('chart');
   const W = Math.max(320, svg.clientWidth || 900), H = W < 500 ? 300 : 340;
@@ -81,7 +82,7 @@ function chart() {
   for (let wk = 1; wk <= n; wk++) if ((wk - 1) % step === 0 || wk === n) s += `<text x="${x(wk)}" y="${H - 8}" text-anchor="middle">${wk}</text>`;
   s += `</g><line class="now" x1="${x(week)}" x2="${x(week)}" y1="${m.t - 4}" y2="${H - m.b + 4}"/>`;
   data.teams.forEach((_, i) => {
-    const pts = data.by_week.map((b) => [x(b.week), y(b.power[i].rank)]);
+    const pts = data.by_week.map((b) => [x(b.week), y(b[chartMode][i].rank)]);
     const d = pts.map((p, k) => `${k ? 'L' : 'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join('');
     const nowPt = pts[week - 1];
     s += `<g class="team" data-team="${i}"><path class="line" d="${d}" stroke="${TEAM_COLORS[i]}"/>
@@ -120,15 +121,16 @@ function applyHighlight() {
   document.querySelectorAll('#legend button').forEach((b) => b.classList.toggle('on', Number(b.dataset.team) === i));
   document.querySelectorAll('tbody tr').forEach((tr) => tr.classList.toggle('hl', Number(tr.dataset.team) === i));
   if (i === null) { $('caption').textContent = 'Hover over a line or a team to highlight it.'; return; }
-  const ranks = data.by_week.map((b) => b.power[i].rank);
-  $('caption').innerHTML = `<b>${esc(data.teams[i])}</b>: rank ${ranks[week - 1]} through week ${week}; best ${Math.min(...ranks)}, worst ${Math.max(...ranks)}`;
+  const ranks = data.by_week.map((b) => b[chartMode][i].rank);
+  const now = chartMode === 'results' ? `Weekly Rank ${ranks[week - 1]} in week ${week}` : `Season Rank ${ranks[week - 1]} through week ${week}`;
+  $('caption').innerHTML = `<b>${esc(data.teams[i])}</b>: ${now}; best ${Math.min(...ranks)}, worst ${Math.max(...ranks)}`;
 }
 
 // ---- Page ----
 function render() {
   const b = data.by_week[week - 1];
-  $('results-title').textContent = `Week ${week} Results`;
-  $('power-title').textContent = `Power Rankings through Week ${week}`;
+  $('results-title').textContent = `Weekly Rank (Current Week): Week ${week}`;
+  $('power-title').textContent = `Season Rank through Week ${week}`;
   $('results').innerHTML = table(b.results, 'results');
   $('power').innerHTML = table(b.power, 'power');
   $('week').value = String(week);
@@ -142,6 +144,15 @@ function render() {
   });
   chart();
   try { history.replaceState(null, '', week === data.weeks ? location.pathname : `#week=${week}`); } catch (e) { /* file:// or sandboxed */ }
+}
+
+function setChartMode(mode) {
+  chartMode = mode;
+  document.querySelectorAll('.seg button').forEach((b) => {
+    b.classList.toggle('on', b.dataset.mode === mode);
+    b.setAttribute('aria-pressed', String(b.dataset.mode === mode));
+  });
+  chart();
 }
 
 function setWeek(w) { week = Math.min(data.weeks, Math.max(1, w)); render(); }
@@ -165,6 +176,7 @@ fetch('data/rankings.json')
     $('prev').addEventListener('click', () => setWeek(week - 1));
     $('next').addEventListener('click', () => setWeek(week + 1));
     $('theme').addEventListener('click', toggleTheme);
+    document.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => setChartMode(b.dataset.mode)));
     document.addEventListener('keydown', (e) => {
       if (e.target.tagName === 'SELECT') return;
       if (e.key === 'ArrowLeft') setWeek(week - 1);
