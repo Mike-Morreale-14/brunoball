@@ -27,7 +27,7 @@
   </header>
 
   <main>
-    <p class="intro">Roto results for my 10-team league: a Weekly Rank for each week, and a Season Rank that blends every week so far, with recent weeks counting most. Roto scoring compares every team with every other team in every category, so a team's rank doesn't depend on who it happened to play. <a href="https://github.com/Mike-Morreale-14/brunoball/blob/main/power-rankings/README.md" target="_blank" rel="noopener">How it works</a></p>
+    <p class="intro">Rankings for my 10-team league, using roto scoring: a Weekly Rank for each week, and a Season Rank that blends every week so far, with recent weeks counting most. Roto scoring compares every team in every category, so a team's rank doesn't depend on its opponent. <a href="https://github.com/Mike-Morreale-14/brunoball/blob/main/power-rankings/README.md" target="_blank" rel="noopener">How it works</a></p>
 
     <section>
       <h2 id="results-title"></h2>
@@ -48,7 +48,10 @@
           <button class="on" data-mode="results" aria-pressed="true">Weekly Rank</button><button data-mode="power" aria-pressed="false">Season Rank</button>
         </div>
         <div class="chart-caption" id="caption">Hover over a line or a team to highlight it.</div>
-        <svg id="chart" role="img" aria-label="Each team's rank by week"></svg>
+        <div class="plot">
+          <svg id="chart" role="img" aria-label="Each team's rank by week"></svg>
+          <div class="tip" id="tip" role="status" hidden></div>
+        </div>
         <div class="legend" id="legend"></div>
       </div>
     </section>

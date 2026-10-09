@@ -88,6 +88,15 @@ tbody tr.hl td { box-shadow: inset 0 1px 0 var(--accent), inset 0 -1px 0 var(--a
 .seg button.on { background: var(--bg-head); color: var(--text); box-shadow: inset 0 -2px 0 var(--accent); }
 .chart-caption { font-size: 12px; color: var(--muted); min-height: 18px; margin-bottom: 4px; }
 .chart-caption b { color: var(--text); }
+.plot { position: relative; }
+.tip { position: absolute; pointer-events: none; z-index: 3; min-width: 120px; max-width: 220px; padding: 7px 10px; background: var(--bg-head); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 14px rgba(0, 0, 0, .35); font-size: 12px; line-height: 1.45; }
+.tip[hidden] { display: none; }
+.tip-team { font-weight: 700; font-size: 13px; overflow-wrap: anywhere; }
+.tip-team .dot { margin-right: 6px; }
+.tip-rank { color: var(--text); font-weight: 600; }
+.tip-range { color: var(--muted); }
+[data-theme="light"] .tip { background: #ffffff; box-shadow: 0 4px 14px rgba(0, 0, 0, .12); }
+[data-theme="light"] .tip-range { color: #666666; }
 #chart { width: 100%; height: auto; display: block; overflow: visible; }
 #chart .axis text { font: 11px var(--mono); fill: var(--muted); }
 #chart .gridline { stroke: var(--grid); stroke-width: 1; }

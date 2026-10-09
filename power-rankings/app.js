@@ -26,6 +26,23 @@ const scaler = (vals) => {
   return (v) => (v - lo) / (hi - lo || 1);
 };
 
+const ordinal = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');
+
+// A team's colour as text: lightened on dark backgrounds or darkened on light ones, just enough for 4.5:1 contrast.
+const lum = (rgb) => {
+  const c = rgb.map((v) => v / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+};
+const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+function textColor(hex) {
+  const rgb = [1, 3, 5].map((k) => parseInt(hex.slice(k, k + 2), 16));
+  const bg = isLight() ? [255, 255, 255] : [30, 40, 64]; // the tooltip background, --bg-head in dark
+  const toward = isLight() ? [0, 0, 0] : [255, 255, 255];
+  let t = 0, c = rgb;
+  while (contrast(c, bg) < 4.5 && t < 1) { t += 0.05; c = mix(rgb, toward, t); }
+  return `rgb(${c})`;
+}
+
 const rec = (r, d = 0) => r.map((x) => x.toFixed(d)).join('-');
 const fmtStat = (cat, v) => (['AVG', 'OPS'].includes(cat) ? v.toFixed(3) : ['ERA', 'WHIP'].includes(cat) ? v.toFixed(2) : String(v));
 function luckCell(l) {
@@ -49,7 +66,7 @@ function table(rows, kind) {
   const sorted = [...rows].sort((a, b) => a.rank - b.rank);
   const totalT = scaler(rows.map((r) => r.roto));
   const catT = Object.fromEntries(data.cats.map((c) => [c, scaler(rows.map((r) => r.pts[c]))]));
-  const extra = kind === 'results' ? ['Record vs. league', 'Avg', 'Actual', 'Luck'] : ['70+ Wk', 'Avg', 'Actual', 'Luck'];
+  const extra = kind === 'results' ? ['Record vs. league', 'Expected', 'Actual', 'Luck'] : ['70+ Wk', 'Expected', 'Actual', 'Luck'];
   const body = sorted.map((r) => {
     const t = totalT(r.roto);
     const cats = data.cats.map((c, k) => {
@@ -89,6 +106,8 @@ function chart() {
       <circle class="pt" cx="${nowPt[0]}" cy="${nowPt[1]}" r="4" fill="${TEAM_COLORS[i]}"/><path class="hit" d="${d}"/></g>`;
   });
   svg.innerHTML = s;
+  // Raising the hovered line can cost it its own mouseleave, so leaving the chart also clears the highlight.
+  svg.onmouseleave = () => highlight(null);
   svg.querySelectorAll('.team').forEach((g) => {
     const i = Number(g.dataset.team);
     g.addEventListener('mouseenter', () => highlight(i));
@@ -120,10 +139,27 @@ function applyHighlight() {
   });
   document.querySelectorAll('#legend button').forEach((b) => b.classList.toggle('on', Number(b.dataset.team) === i));
   document.querySelectorAll('tbody tr').forEach((tr) => tr.classList.toggle('hl', Number(tr.dataset.team) === i));
-  if (i === null) { $('caption').textContent = 'Hover over a line or a team to highlight it.'; return; }
+  tooltip(i);
+}
+
+// Tooltip card next to the team's point at the selected week, in the chart's current view.
+function tooltip(i) {
+  const tip = $('tip');
+  if (i === null) { tip.hidden = true; return; }
   const ranks = data.by_week.map((b) => b[chartMode][i].rank);
-  const now = chartMode === 'results' ? `Weekly Rank ${ranks[week - 1]} in week ${week}` : `Season Rank ${ranks[week - 1]} through week ${week}`;
-  $('caption').innerHTML = `<b>${esc(data.teams[i])}</b>: ${now}; best ${Math.min(...ranks)}, worst ${Math.max(...ranks)}`;
+  tip.innerHTML = `<div class="tip-team" style="color:${textColor(TEAM_COLORS[i])}"><span class="dot" style="background:${TEAM_COLORS[i]}"></span>${esc(data.teams[i])}</div>
+    <div class="tip-rank">${ordinal(ranks[week - 1])} · Week ${week}</div>
+    <div class="tip-range">Best ${ordinal(Math.min(...ranks))} · Worst ${ordinal(Math.max(...ranks))}</div>`;
+  tip.hidden = false;
+  const plot = tip.parentElement.getBoundingClientRect();
+  const pt = $('chart').querySelector(`.team[data-team="${i}"] .pt`).getBoundingClientRect();
+  const px = pt.left + pt.width / 2 - plot.left, py = pt.top + pt.height / 2 - plot.top;
+  const gap = 12, w = tip.offsetWidth, h = tip.offsetHeight;
+  // Right of the point if it fits, otherwise left; vertically centred on it, kept inside the chart.
+  const left = px + gap + w <= plot.width ? px + gap : Math.max(0, px - gap - w);
+  const top = Math.min(Math.max(0, py - h / 2), plot.height - h);
+  tip.style.left = `${left}px`;
+  tip.style.top = `${top}px`;
 }
 
 // ---- Page ----

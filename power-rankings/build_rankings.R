@@ -95,7 +95,7 @@ weeks <- map(seq_len(N_WEEKS), \(w) {
 power <- map(seq_len(N_WEEKS), \(n) {
   w <- season_weights(n)
   cat_pts <- Reduce(`+`, map2(weeks[seq_len(n)], w, \(x, wt) x$pts * wt))
-  # Records are season totals, not decayed; "Avg" sums each week's record vs. league divided by 9.
+  # Records are season totals, not decayed; "Expected" sums each week's record vs. league divided by 9.
   vs_league <- Reduce(`+`, map(weeks[seq_len(n)], "vs_league"))
   actual <- Reduce(`+`, map(weeks[seq_len(n)], "actual"))
   dominant <- Reduce(`+`, map(weeks[seq_len(n)], \(x) as.integer(x$vs_league[, "w"] >= DOMINANT_WINS)))

@@ -24,8 +24,8 @@ skills, and you can adjust the weights as you draft.
 
 [<img src="power-rankings/rank-by-week.png" width="700" alt="Weekly Rank by week, with Team Bruno highlighted">](https://mike-morreale-14.github.io/brunoball/power-rankings/)
 
-I posted power rankings to the league group chat every week. Teams are
-ranked on roto points, so the order doesn't depend on who played whom.
+I posted power rankings to the league group chat every week. The rankings
+use roto scoring, a standard technique to eliminate schedule luck.
 Weekly Rank shows one week, and Season Rank blends every week, with
 recent weeks counting most.
 
