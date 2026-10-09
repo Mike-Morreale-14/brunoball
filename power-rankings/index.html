@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Weekly roto results and seasonally weighted power rankings for my 10-team fantasy baseball league, 2026.">
+  <title>Power Rankings 2026</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0e1a'/%3E%3Ctext x='50' y='62' font-size='40' text-anchor='middle' fill='%234a9eff' font-family='monospace' font-weight='700'%3EPR%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // Same saved theme as the draft tool, applied before first paint.
+    try { if (localStorage.getItem('ds-theme') === 'light') document.documentElement.dataset.theme = 'light'; } catch (e) {}
+  </script>
+</head>
+<body>
+  <header class="top">
+    <h1>Power Rankings 2026</h1>
+    <div class="controls">
+      <button class="btn" id="prev" aria-label="Previous week">◀</button>
+      <label class="week-pick">Week <select id="week" aria-label="Week"></select></label>
+      <button class="btn" id="next" aria-label="Next week">▶</button>
+      <button class="btn" id="theme" title="Toggle theme (T)"></button>
+    </div>
+  </header>
+
+  <main>
+    <p class="intro">Each week's roto and all-play results for my 10-team league, and power rankings that weight recent weeks more. <a href="https://github.com/Mike-Morreale-14/brunoball/blob/main/power-rankings/README.md" target="_blank" rel="noopener">How it works</a></p>
+
+    <section>
+      <h2 id="results-title"></h2>
+      <div class="wrap"><table id="results"></table></div>
+    </section>
+
+    <section>
+      <h2 id="power-title"></h2>
+      <div class="wrap"><table id="power"></table></div>
+    </section>
+
+    <section>
+      <h2>Power Rank by Week</h2>
+      <div class="chart-box">
+        <div class="chart-caption" id="caption">Hover over a line or a team to highlight it.</div>
+        <svg id="chart" role="img" aria-label="Each team's power rank by week"></svg>
+        <div class="legend" id="legend"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    Data from my league's weekly Yahoo results ·
+    <a href="https://github.com/Mike-Morreale-14/brunoball" target="_blank" rel="noopener">brunoball on GitHub</a>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

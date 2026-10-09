@@ -22,8 +22,13 @@ skills, and you can adjust the weights as you draft.
 
 ## Weekly Power Rankings
 
-Coming soon: a weekly ranking that plays every team against all nine
-others to separate record from luck.
+[![Power rank by week](power-rankings/rank-by-week.png)](https://mike-morreale-14.github.io/brunoball/power-rankings/)
+
+Weekly roto and all-play results for my league, with power rankings that
+weight recent weeks more, so you can see who was strong and who was lucky.
+
+**[View the rankings](https://mike-morreale-14.github.io/brunoball/power-rankings/)**
+· [How it works](power-rankings/)
 
 ## Season Wrapped
 
