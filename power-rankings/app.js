@@ -36,7 +36,7 @@ const lum = (rgb) => {
 const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
 function textColor(hex) {
   const rgb = [1, 3, 5].map((k) => parseInt(hex.slice(k, k + 2), 16));
-  const bg = isLight() ? [255, 255, 255] : [30, 40, 64]; // the tooltip background, --bg-head in dark
+  const bg = isLight() ? [255, 255, 255] : [20, 26, 44]; // the chart panel behind the caption, --bg-panel
   const toward = isLight() ? [0, 0, 0] : [255, 255, 255];
   let t = 0, c = rgb;
   while (contrast(c, bg) < 4.5 && t < 1) { t += 0.05; c = mix(rgb, toward, t); }
@@ -139,19 +139,16 @@ function applyHighlight() {
   });
   document.querySelectorAll('#legend button').forEach((b) => b.classList.toggle('on', Number(b.dataset.team) === i));
   document.querySelectorAll('tbody tr').forEach((tr) => tr.classList.toggle('hl', Number(tr.dataset.team) === i));
-  tooltip(i);
+  caption(i);
 }
 
-// Tooltip card above the chart (outside the plotted area), for the selected week in the chart's current view.
-function tooltip(i) {
-  const tip = $('tip');
-  tip.classList.toggle('off', i === null);
-  $('chart-head').classList.toggle('active', i !== null);
-  if (i === null) return; // the last card stays in place, hidden, so the chart doesn't shift
+// The line under the chart toggle: the highlighted team's rank for the selected week, in the chart's current view.
+function caption(i) {
+  if (i === null) { $('caption').textContent = 'Hover over a line or a team to highlight it.'; return; }
   const ranks = data.by_week.map((b) => b[chartMode][i].rank);
-  tip.innerHTML = `<div class="tip-team" style="color:${textColor(TEAM_COLORS[i])}"><span class="dot" style="background:${TEAM_COLORS[i]}"></span>${esc(data.teams[i])}</div>
-    <div class="tip-rank">${ordinal(ranks[week - 1])} · Week ${week}</div>
-    <div class="tip-range">Best ${ordinal(Math.min(...ranks))} · Worst ${ordinal(Math.max(...ranks))}</div>`;
+  $('caption').innerHTML = `<span class="dot" style="background:${TEAM_COLORS[i]}"></span><b style="color:${textColor(TEAM_COLORS[i])}">${esc(data.teams[i])}</b>
+    · <span class="cap-rank">${ordinal(ranks[week - 1])} · Week ${week}</span>
+    · Best ${ordinal(Math.min(...ranks))} · Worst ${ordinal(Math.max(...ranks))}`;
 }
 
 // ---- Page ----

@@ -81,26 +81,15 @@ tbody tr.hl td { box-shadow: inset 0 1px 0 var(--accent), inset 0 -1px 0 var(--a
 
 /* Chart */
 .chart-box { border: 1px solid var(--border); border-radius: 10px; background: var(--bg-panel); padding: 12px; }
-/* Chart header: toggle and hint on the left, tooltip card on the right; the card's space is always kept so the chart never moves. */
-.chart-head { display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto; align-items: start; column-gap: 12px; row-gap: 6px; margin-bottom: 8px; }
-.chart-head .seg { grid-area: 1 / 1; justify-self: start; }
-.chart-head .chart-caption { grid-area: 2 / 1; }
-.chart-head .tip { grid-area: 1 / 2 / 3 / 3; }
-.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; margin-bottom: 8px; }
 .seg button { font: 600 12px var(--sans); color: var(--muted); background: none; border: none; padding: 5px 12px; cursor: pointer; }
 .seg button + button { border-left: 1px solid var(--border); }
 .seg button:hover { color: var(--text); }
 .seg button.on { background: var(--bg-head); color: var(--text); box-shadow: inset 0 -2px 0 var(--accent); }
-.chart-caption { font-size: 12px; color: var(--muted); }
-.chart-caption b { color: var(--text); }
-.tip { min-height: 72px; min-width: 170px; max-width: 260px; padding: 7px 10px; background: var(--bg-head); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 14px rgba(0, 0, 0, .35); font-size: 12px; line-height: 1.45; }
-.tip.off { visibility: hidden; }
-.tip-team { font-weight: 700; font-size: 13px; overflow-wrap: anywhere; }
-.tip-team .dot { margin-right: 6px; }
-.tip-rank { color: var(--text); font-weight: 600; }
-.tip-range { color: var(--muted); }
-[data-theme="light"] .tip { background: #ffffff; box-shadow: 0 4px 14px rgba(0, 0, 0, .12); }
-[data-theme="light"] .tip-range { color: #666666; }
+.chart-caption { font-size: 12px; line-height: 1.5; color: var(--muted); min-height: 18px; margin-bottom: 4px; }
+.chart-caption .dot { margin-right: 6px; }
+.chart-caption .cap-rank { color: var(--text); font-weight: 600; }
+[data-theme="light"] .chart-caption { color: #666666; }
 #chart { width: 100%; height: auto; display: block; overflow: visible; }
 #chart .axis text { font: 11px var(--mono); fill: var(--muted); }
 #chart .gridline { stroke: var(--grid); stroke-width: 1; }
@@ -124,9 +113,6 @@ tbody tr.hl td { box-shadow: inset 0 1px 0 var(--accent), inset 0 -1px 0 var(--a
   th, td { padding: 4px 5px; }
   .c-rank { min-width: 32px; }
   .c-team { left: 32px; min-width: 0; max-width: 128px; overflow: hidden; text-overflow: ellipsis; }
-  /* Phone: the card takes the hint's row, full width, and the hint steps aside while it shows. */
-  .chart-head { grid-template-columns: 1fr; grid-template-rows: auto minmax(72px, auto); }
-  .chart-head .chart-caption, .chart-head .tip { grid-area: 2 / 1; }
-  .chart-head .tip { max-width: none; align-self: start; }
-  .chart-head.active .chart-caption { visibility: hidden; }
+  /* Room for two lines, so the chart doesn't move when a long team name wraps. */
+  .chart-caption { min-height: 36px; }
 }
