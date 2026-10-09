@@ -4,9 +4,9 @@ An end-of-season recap I made for the league, inspired by Spotify Wrapped. It co
 
 **[View the slides](https://mike-morreale-14.github.io/brunoball/wrapped/)**
 
-[<img src="slides/08.jpg" width="700" alt="Schedule Luck slide: each team's actual and expected record, and the wins gained or lost to the schedule">](https://mike-morreale-14.github.io/brunoball/wrapped/)
+[<img src="crops/08.jpg" width="700" alt="Schedule Luck slide: each team's actual and expected record, and the wins gained or lost to the schedule">](https://mike-morreale-14.github.io/brunoball/wrapped/)
 
-[<img src="slides/07.jpg" width="700" alt="Expected Record slide: one team's week replayed against all nine other teams">](https://mike-morreale-14.github.io/brunoball/wrapped/)
+[<img src="crops/07.jpg" width="700" alt="Expected Record slide: one team's week replayed against all nine other teams">](https://mike-morreale-14.github.io/brunoball/wrapped/)
 
 Power Score here is each team's average weekly place in a category across all 22 weeks, weighted equally; the [power rankings](../power-rankings/) page's Season Rank weights recent weeks more.
 
