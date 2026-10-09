@@ -52,4 +52,4 @@ In progress: Trading research and new in-season visuals.
 
 ## AI Assistance
 
-The code in this project is primarily written using Claude Code.  
+Claude Code is used in the project to write code and automate workflows.
