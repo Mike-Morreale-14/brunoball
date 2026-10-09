@@ -142,24 +142,16 @@ function applyHighlight() {
   tooltip(i);
 }
 
-// Tooltip card next to the team's point at the selected week, in the chart's current view.
+// Tooltip card above the chart (outside the plotted area), for the selected week in the chart's current view.
 function tooltip(i) {
   const tip = $('tip');
-  if (i === null) { tip.hidden = true; return; }
+  tip.classList.toggle('off', i === null);
+  $('chart-head').classList.toggle('active', i !== null);
+  if (i === null) return; // the last card stays in place, hidden, so the chart doesn't shift
   const ranks = data.by_week.map((b) => b[chartMode][i].rank);
   tip.innerHTML = `<div class="tip-team" style="color:${textColor(TEAM_COLORS[i])}"><span class="dot" style="background:${TEAM_COLORS[i]}"></span>${esc(data.teams[i])}</div>
     <div class="tip-rank">${ordinal(ranks[week - 1])} · Week ${week}</div>
     <div class="tip-range">Best ${ordinal(Math.min(...ranks))} · Worst ${ordinal(Math.max(...ranks))}</div>`;
-  tip.hidden = false;
-  const plot = tip.parentElement.getBoundingClientRect();
-  const pt = $('chart').querySelector(`.team[data-team="${i}"] .pt`).getBoundingClientRect();
-  const px = pt.left + pt.width / 2 - plot.left, py = pt.top + pt.height / 2 - plot.top;
-  const gap = 12, w = tip.offsetWidth, h = tip.offsetHeight;
-  // Right of the point if it fits, otherwise left; vertically centred on it, kept inside the chart.
-  const left = px + gap + w <= plot.width ? px + gap : Math.max(0, px - gap - w);
-  const top = Math.min(Math.max(0, py - h / 2), plot.height - h);
-  tip.style.left = `${left}px`;
-  tip.style.top = `${top}px`;
 }
 
 // ---- Page ----

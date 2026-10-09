@@ -14,7 +14,7 @@ One week only. Each team is ranked 1 to 10 in each of the 12 categories on that 
 
 ### Season Rank
 
-The Season Rank blends each week's roto points, not raw stats. Weeks differ in length: in my league's data, week 1 has about half a normal week's counting stats, and week 17, which spans the All-Star break, has about one and a half times as much. Raw counting stats aren't always comparable from week to week, but roto scoring puts every week on the same 1 to 10 scale. Each week counts 0.8 times as much as the week after it.
+The Season Rank blends each week's roto points, not raw stats. Weeks differ in length: in my league's data, week 1 has about half a normal week's counting stats, and week 17, which spans the All-Star break, has about one and a half times as much. Raw counting stats aren't always comparable from week to week, but roto scoring puts every week on the same scale. Each week counts 0.8 times as much as the week after it.
 
 <img src="weighting-heatmap.png" width="700" alt="Heatmap of each week's share of the weight in the Season Rank, as of each week from 1 to 22">
 
