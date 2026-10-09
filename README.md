@@ -8,12 +8,14 @@ and an end-of-season recap to commemorate the year.
 
 ## Draft Scout
 
-[![Draft Scout](draft-tool/guide/2-list.png)](https://mike-morreale-14.github.io/brunoball/draft-tool/)
+[![Draft Scout](draft-tool/screenshot.png)](https://mike-morreale-14.github.io/brunoball/draft-tool/)
 
-A draft tool that scores every player in the top 300 of FantasyPros ADP
-three ways: what he did in 2025, what his skills say, and a blend I
-draft from. The gap between the first two flags who's due to rise or
-fall. Projections are my own Marcel implementation.
+A draft tool that lists the top 300 players by FantasyPros ADP.
+Hitters are scored on Power, Speed and AVG, and starting
+pitchers on Anchor, K Arm and Volatility, so you can see what
+role a player would fill on your team. Scores blend 2026
+projections (Tom Tango's Marcel method), 2025 stats and Statcast
+skills, and you can adjust the weights as you draft.
 
 **[Try the draft tool](https://mike-morreale-14.github.io/brunoball/draft-tool/)**
 · [How it works](draft-tool/) · [Data pipeline](data-pipeline/)

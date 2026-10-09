@@ -309,7 +309,7 @@ function renderHeader() {
     <span class="chip${state.hideGone ? ' on' : ''}" style="--chip-color:#5a5040" data-act="hide-gone">Hide Taken</span>
     <span class="chip${state.open.filters ? ' on' : filtersOn ? ' attn' : ''}" data-act="panel" data-v="filters">Filters</span>
     <button class="theme-btn" data-act="theme" title="Toggle theme (T)">${light ? '☀️ Light' : '🌙 Dark'}</button>
-    <a class="chip guide-link" href="${REPO_URL}/blob/main/draft-tool/GUIDE.md" target="_blank" rel="noopener">How to use</a>
+    <a class="chip guide-link" href="${REPO_URL}/blob/main/draft-tool/README.md" target="_blank" rel="noopener">How to use</a>
     <input class="search" id="search" type="text" placeholder="Search..." aria-label="Search players" value="${esc(state.search)}">
     <span class="count" id="count"></span>`;
   updateCount();
